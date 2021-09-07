@@ -1,0 +1,5 @@
+Songs
+*.mp3
+*.webm
+.vscode
+__pycache__
