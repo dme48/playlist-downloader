@@ -5,6 +5,15 @@ import sys
 import os
 import json
 
+"""
+Searches and downloads a playlist
+
+    Parameters:
+        playlist_url (argv[1]): url of the spotify playlist.
+        [directory_name] (argv[2]): songs' directory name. Will be created if
+            it doesn't exist.
+"""
+
 num_args = len(sys.argv) - 1
 
 if num_args >= 3:
