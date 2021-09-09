@@ -1,4 +1,4 @@
-"""Container for Scrapper"""
+"""Container for the Scrapper class"""
 from urllib import request
 import re
 
@@ -12,7 +12,7 @@ class Scrapper:
         """
         self.raw_html = request.urlopen(url).read().decode("utf-8")
         self.songs()
-    
+
     def songs(self):
         """Extracts song titles from the raw html"""
         pattern = r'(?<="is_playable":true,"name":")[^"]+(?=")'

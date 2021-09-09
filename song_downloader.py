@@ -48,7 +48,7 @@ class Downloader:
         selected_vid = None
         for vid in self.vid_query.result()["result"]:
             duration = str_to_sec(vid["duration"])
-            if (duration < min_duration):
+            if duration < min_duration:
                 min_duration = duration
                 selected_vid = vid
         return selected_vid
@@ -63,6 +63,6 @@ class Downloader:
         previously selected video.
         """
         url = self.vid_info["link"]
-        command = "youtube-dl -x --audio-format mp3 \"" + url + "\" -o \"" + self.path + "/%(title)s.%(ext)s\""
-        print("The command is: " + command)
+        command = ("youtube-dl -x --audio-format mp3 \"" +
+                   url + "\" -o \"" + self.path + "/%(title)s.%(ext)s\"")
         os.system(command)
