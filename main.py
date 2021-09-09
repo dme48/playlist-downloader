@@ -7,25 +7,24 @@ Searches and downloads a playlist
         [directory_name] (argv[2]): songs' directory name. Will be created if
             it doesn't exist.
 """
+import os
+import sys
 from playlist_scrapper import Scrapper
 from song_downloader import Downloader
-import sys
-import os
-import json
 
 
-num_args = len(sys.argv) - 1
+NUM_ARGS = len(sys.argv) - 1
 
-if num_args >= 3:
+if NUM_ARGS >= 3:
     sys.exit("Too many arguments")
-if num_args == 0:
+if NUM_ARGS == 0:
     sys.exit("Not enough arguments")
 
 playlist_url = sys.argv[1]
 
-if num_args == 1:
+if NUM_ARGS == 1:
     path = os.getcwd() + "/Songs"
-elif num_args == 2:
+elif NUM_ARGS == 2:
     path = os.getcwd() + "/" + sys.argv[2]
 
 if not os.path.exists(path):
