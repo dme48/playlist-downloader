@@ -1,5 +1,6 @@
 Songs
 *.mp3
 *.webm
+linter.out
 .vscode
 __pycache__

@@ -1,10 +1,4 @@
 #!/usr/bin/python
-from playlist_scrapper import Scrapper
-from song_downloader import Downloader
-import sys
-import os
-import json
-
 """
 Searches and downloads a playlist
 
@@ -13,6 +7,12 @@ Searches and downloads a playlist
         [directory_name] (argv[2]): songs' directory name. Will be created if
             it doesn't exist.
 """
+from playlist_scrapper import Scrapper
+from song_downloader import Downloader
+import sys
+import os
+import json
+
 
 num_args = len(sys.argv) - 1
 
@@ -26,7 +26,7 @@ playlist_url = sys.argv[1]
 if num_args == 1:
     path = os.getcwd() + "/Songs"
 elif num_args == 2:
-    path = os.getcwd() + "/" + sys.argv[2] 
+    path = os.getcwd() + "/" + sys.argv[2]
 
 if not os.path.exists(path):
     os.mkdir(path)
