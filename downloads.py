@@ -1,6 +1,7 @@
 """Container for the Downloader class"""
 import os
 import threading
+from pytube import YouTube
 from youtubesearchpython import VideosSearch
 
 
@@ -93,16 +94,24 @@ class Downloader:
         return selected_vid
 
     def download(self):
-        """Wraps call_ydl in a thread and starts it."""
-        job = threading.Thread(target=self.call_ydl)
+        """Wraps call_pytube in a thread and starts it."""
+        job = threading.Thread(target=self.call_pytube)
         job.start()
 
-    def call_ydl(self):
-        """
-        'Call youtube-dl'. Creates the adequate shell command to download the
-        previously selected video.
-        """
+    def call_pytube(self):
+        """Downloads an audio stream"""
         url = self.vid_info["link"]
-        command = ("youtube-dl -x --audio-format mp3 \"" +
-                   url + "\" -o \"" + self.path + "/%(title)s.%(ext)s\"")
-        os.system(command)
+        stream = self.select_stream(url)
+        stream.download(output_path=self.path)
+        
+    
+    def select_stream(self, url):
+        """
+        Selects an audio stream from a youtube url.
+            Returns:
+                stream (audio stream): audio stream with 
+                    the highest kbps.
+        """
+        yt_vid = YouTube(url)
+        audio_stream = yt_vid.streams.filter(only_audio=True)
+        return audio_stream.order_by("abr").first()
