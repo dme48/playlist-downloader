@@ -10,7 +10,7 @@ Searches and downloads a playlist
 import os
 import sys
 from playlist_scrapper import Scrapper
-from song_downloader import Downloader
+from song_downloader import DownloadManager
 
 
 NUM_ARGS = len(sys.argv) - 1
@@ -33,9 +33,5 @@ if not os.path.exists(path):
 playlist_titles = Scrapper(playlist_url).songs()
 playlist_titles.append("blue eyes elton john")
 
-all_downloaders = []
-
-for song in playlist_titles:
-    downloader = Downloader(song, path)
-    downloader.download()
-    all_downloaders.append(downloader)
+down_manager = DownloadManager(playlist_titles, path)
+down_manager.start_all()
