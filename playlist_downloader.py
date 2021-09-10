@@ -9,7 +9,7 @@ Searches and downloads a playlist
 """
 import os
 import sys
-from scrap import Scrapper
+from scrap import scrap_songs
 from downloads import DownloadManager
 
 
@@ -30,7 +30,7 @@ elif NUM_ARGS == 2:
 if not os.path.exists(path):
     os.mkdir(path)
 
-playlist_titles = Scrapper(playlist_url).songs()
+playlist_titles = scrap_songs(playlist_url)
 playlist_titles.append("blue eyes elton john")
 
 down_manager = DownloadManager(playlist_titles, path)
