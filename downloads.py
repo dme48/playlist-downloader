@@ -76,7 +76,6 @@ class Downloader:
         self.path = path
         self.vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
         self.vid_info = self.min_duration_video()
-        self.job = threading.Thread(target=self.call_ydl)
 
     def min_duration_video(self):
         """
@@ -94,8 +93,9 @@ class Downloader:
         return selected_vid
 
     def download(self):
-        """Wrapper around the thread's job"""
-        self.job.start()
+        """Wraps call_ydl in a thread and starts it."""
+        job = threading.Thread(target=self.call_ydl)
+        job.start()
 
     def call_ydl(self):
         """
