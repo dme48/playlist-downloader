@@ -9,8 +9,8 @@ Searches and downloads a playlist
 """
 import os
 import sys
-from playlist_scrapper import Scrapper
-from song_downloader import DownloadManager
+from scrap import Scrapper
+from downloads import DownloadManager
 
 
 NUM_ARGS = len(sys.argv) - 1

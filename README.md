@@ -4,6 +4,6 @@ Playlist Downloader is a tool to download songs from a Spotify's playlist. The s
 
 ## Usage
 ```
-    python main.py <spotify's url> [saving folder]
+    python playlist_downloader.py <spotify's url> [saving folder]
 ```
 By default, the program creates a `Songs` folder to save the files.
