@@ -4,34 +4,6 @@ from pytube import YouTube
 from youtubesearchpython import VideosSearch
 
 
-def str_to_sec(duration):
-    """
-    Converts a measure of time into its corresponding seconds
-        Parameters:
-            duration (str): The time interval. Must be specified int the format
-                (h)h:mm:ss, (m)m:ss or (s)s.
-        Returns:
-            coutn (int): Number of seconds in the interval.
-    """
-    count = 0
-    units = [int(s) for s in duration.split(":")]
-    for unit in units:
-        count *= 60
-        count += unit
-    return count
-
-def select_stream(url):
-    """
-    Selects an audio stream from a youtube url.
-        Returns:
-            stream (audio stream): audio stream with
-                the highest kbps.
-    """
-    yt_vid = YouTube(url)
-    audio_stream = yt_vid.streams.filter(only_audio=True)
-    return audio_stream.order_by("abr").first()
-
-
 class DownloadManager:
     """Class that handles all the downloads through Downloader instances"""
 
@@ -47,11 +19,6 @@ class DownloadManager:
         self.path = path
         self.downloads = [Downloader(song, path) for song in song_list]
         self.has_started = [False] * len(song_list)
-
-    def print_song_id(self):
-        """Prints the song names and their indexes"""
-        for i, song in enumerate(self.song_list):
-            print("id: {},\ttitle: {}".format(i, song))
 
     def start_all(self):
         """Starts all downloads that haven't started already."""
@@ -71,6 +38,12 @@ class DownloadManager:
         """Starts the download of the song with the indicated name."""
         index = self.song_list.index(song_name)
         self.start_by_id(index)
+
+    def print_song_id(self):
+        """Prints the song names and their indexes"""
+        for i, song in enumerate(self.song_list):
+            print("id: {},\ttitle: {}".format(i, song))
+            
 
 class Downloader:
     """Class that handles the download of a single video"""
@@ -119,3 +92,31 @@ class Downloader:
         """Basic callback, announces the download is over"""
         title = self.vid_info["title"]
         print("Song \"{}\" has finished downloading.".format(title))
+
+
+def str_to_sec(duration):
+    """
+    Converts a measure of time into its corresponding seconds
+        Parameters:
+            duration (str): The time interval. Must be specified int the format
+                (h)h:mm:ss, (m)m:ss or (s)s.
+        Returns:
+            coutn (int): Number of seconds in the interval.
+    """
+    count = 0
+    units = [int(s) for s in duration.split(":")]
+    for unit in units:
+        count *= 60
+        count += unit
+    return count
+
+def select_stream(url):
+    """
+    Selects an audio stream from a youtube url.
+        Returns:
+            stream (audio stream): audio stream with
+                the highest kbps.
+    """
+    yt_vid = YouTube(url)
+    audio_stream = yt_vid.streams.filter(only_audio=True)
+    return audio_stream.order_by("abr").first()
