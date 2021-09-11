@@ -1,5 +1,4 @@
 """Container for the Downloader class"""
-import os
 import threading
 from pytube import YouTube
 from youtubesearchpython import VideosSearch
