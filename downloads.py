@@ -1,6 +1,7 @@
 """Container for the Downloader class"""
 import threading
 from pytube import YouTube
+from progressbar import ProgressBar
 from youtubesearchpython import VideosSearch
 
 
@@ -9,16 +10,21 @@ class DownloadManager:
 
     def __init__(self, song_list, path):
         """
-        Creates a Downloader instance for each song in song_list. Also initializes
-        the has_started list, which keeps track of which downloads have been started.
+        Creates a Downloader instance for each song in song_list.
+        Initializes the has_started list, which keeps track of which downloads have been
+        started.
+        Creates a ProgressBar, used to keep track of the state of the downloads, and feeds
+        it to the Download instances.
             Parameters:
                 song_list (string list): list with the titles of the songs to be downloaded.
                 path (string): path of the directory where the songs will be saved.
         """
         self.song_list = song_list
         self.path = path
-        self.downloads = [Downloader(song, path) for song in song_list]
         self.has_started = [False] * len(song_list)
+
+        bar = ProgressBar()
+        self.downloads = [Downloader(song, path, bar) for song in song_list]
 
     def start_all(self):
         """Starts all downloads that haven't started already."""
@@ -46,20 +52,25 @@ class DownloadManager:
             
 
 class Downloader:
-    """Class that handles the download of a single video"""
+    """
+    Class that handles the download of a single video.
+    """
     TRIAL_VIDS = 3
 
-    def __init__(self, title, path):
+    def __init__(self, title, path, bar):
         """
         Querys and selects a video; sets the download as a thread.
             Parameters:
                 title (str): title of the song
                 path (str): path of the directory where the song is to ve saved
+                bar (ProgressBar): Bar that shows the status of the download. The
+                    function bar.callback is used to update it.
         """
         self.title = title
         self.path = path
         self.vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
         self.vid_info = self.min_duration_video()
+        self.bar = bar
 
     def min_duration_video(self):
         """
@@ -84,15 +95,19 @@ class Downloader:
     def call_pytube(self):
         """Downloads an audio stream"""
         url = self.vid_info["link"]
-        stream = select_stream(url)
+        stream = self.select_stream(url)
         stream.download(output_path=self.path)
-        self.callback()
 
-    def callback(self):
-        """Basic callback, announces the download is over"""
-        title = self.vid_info["title"]
-        print("Song \"{}\" has finished downloading.".format(title))
-
+    def select_stream(self, url):
+        """
+        Selects an audio stream from a youtube url.
+            Returns:
+                stream (audio stream): audio stream with
+                    the highest kbps.
+        """
+        yt_vid = YouTube(url, on_progress_callback=self.bar.callback)
+        audio_stream = yt_vid.streams.filter(only_audio=True)
+        return audio_stream.order_by("abr").first()
 
 def str_to_sec(duration):
     """
@@ -110,13 +125,4 @@ def str_to_sec(duration):
         count += unit
     return count
 
-def select_stream(url):
-    """
-    Selects an audio stream from a youtube url.
-        Returns:
-            stream (audio stream): audio stream with
-                the highest kbps.
-    """
-    yt_vid = YouTube(url)
-    audio_stream = yt_vid.streams.filter(only_audio=True)
-    return audio_stream.order_by("abr").first()
+
