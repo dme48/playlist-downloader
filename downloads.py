@@ -20,6 +20,17 @@ def str_to_sec(duration):
         count += unit
     return count
 
+def select_stream(url):
+    """
+    Selects an audio stream from a youtube url.
+        Returns:
+            stream (audio stream): audio stream with
+                the highest kbps.
+    """
+    yt_vid = YouTube(url)
+    audio_stream = yt_vid.streams.filter(only_audio=True)
+    return audio_stream.order_by("abr").first()
+
 
 class DownloadManager:
     """Class that handles all the downloads through Downloader instances"""
@@ -100,17 +111,11 @@ class Downloader:
     def call_pytube(self):
         """Downloads an audio stream"""
         url = self.vid_info["link"]
-        stream = self.select_stream(url)
+        stream = select_stream(url)
         stream.download(output_path=self.path)
-        
-    
-    def select_stream(self, url):
-        """
-        Selects an audio stream from a youtube url.
-            Returns:
-                stream (audio stream): audio stream with 
-                    the highest kbps.
-        """
-        yt_vid = YouTube(url)
-        audio_stream = yt_vid.streams.filter(only_audio=True)
-        return audio_stream.order_by("abr").first()
+        self.callback()
+
+    def callback(self):
+        """Basic callback, announces the download is over"""
+        title = self.vid_info["title"]
+        print("Song \"{}\" has finished downloading.".format(title))
