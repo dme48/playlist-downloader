@@ -32,13 +32,16 @@ class StreamTracker:
             Parameters:
                 stream (pytube's stream): Stream to be tracked.
         """
-        self.TOTAL_BYTES = stream.filesize
+        self.STREAM_BYTES = stream.filesize
         self.downloaded_bytes = 0
+        self.last_chunk_size = 0
 
     def downloaded_percentage(self):
         """Percentage of the stream that has been downloaded"""
-        return 100 * self.downloaded_bytes / self.TOTAL_BYTES
+        return 100 * self.downloaded_bytes / self.STREAM_BYTES
 
     def update_downloaded_bytes(self, remaining_bytes):
         """Updates self.downloaded_bytes in StreamTracker"""
-        self.downloaded_bytes = self.TOTAL_BYTES - remaining_bytes
+        updated_bytes = self.STREAM_BYTES - remaining_bytes
+        self.last_chunk_size = updated_bytes - self.downloaded_bytes
+        self.downloaded_bytes = updated_bytes
