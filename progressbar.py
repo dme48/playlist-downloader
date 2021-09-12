@@ -24,14 +24,19 @@ class ProgressBar:
     def callback(self, stream, chunk, remaining_bytes):
         """
         TODO, not implemented yet
-        Recieves information from a particular stream and updates it.
+        Callback method for the pytube stream.download() method.
+        Recieves information from a particular stream, transmits the information to the relevant
+        StreamTracker and updates the status of ProgressBar.
             Parameters:
                 stream (pytube stream): the stream whose download sent the callback
                 chunk (bytes): the chunk of bytes that has just been downloaded
                 remaining_bytes (int): the amount of bytes that haven't been downloaded
                     yet, in the stream from the argument
         """
-        print("I received a callback")
+        tracker = self.stream_trackers.get(stream)
+        tracker.update_downloaded_bytes(remaining_bytes)
+
+        self.bar.update(tracker.last_chunk_size)
 
 
 class StreamTracker:
