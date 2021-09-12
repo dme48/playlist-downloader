@@ -43,7 +43,7 @@ class DownloadManager:
         """Prints the song names and their indexes"""
         for i, song in enumerate(self.song_list):
             print("id: {},\ttitle: {}".format(i, song))
-            
+
 
 class Downloader:
     """Class that handles the download of a single video"""
