@@ -23,8 +23,10 @@ class DownloadManager:
         self.path = path
         self.has_started = [False] * len(song_list)
 
-        bar = ProgressBar()
-        self.downloads = [Downloader(song, path, bar) for song in song_list]
+        self.downloads = [Downloader(song, path, self) for song in song_list]
+
+        stream_list = [s for s in self.downloads.stream]
+        self.bar = ProgressBar(stream_list)
 
     def start_all(self):
         """Starts all downloads that haven't started already."""
@@ -49,7 +51,18 @@ class DownloadManager:
         """Prints the song names and their indexes"""
         for i, song in enumerate(self.song_list):
             print("id: {},\ttitle: {}".format(i, song))
-            
+    
+    def callback(self, stream, chunk, remaining_bytes):
+        """
+        Connector between the callbacks in Downloader instances and the bar.
+        See ProgressBar.callback for more info about the callback
+        """
+        if "bar" not in self.__dict__.keys():
+            raise Exception("The ProgressBar in DownloadManager should have" \
+                            "been created before callback is called.")
+
+        self.bar.callback(stream, chunk, remaining_bytes)
+
 
 class Downloader:
     """
@@ -57,18 +70,17 @@ class Downloader:
     """
     TRIAL_VIDS = 3
 
-    def __init__(self, title, path, bar):
+    def __init__(self, title, path, parent):
         """
         Querys and selects a video; sets the download as a thread.
             Parameters:
                 title (str): title of the song
                 path (str): path of the directory where the song is to ve saved
-                bar (ProgressBar): Bar that shows the status of the download. The
-                    function bar.callback is used to update it.
+                parent (DownloadManager): Manager of all the Downloader instances.
         """
         self.title = title
         self.path = path
-        self.bar = bar
+        self.callback = parent.callback
 
         vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
         vid_info = min_duration_video(vid_query)
@@ -90,7 +102,7 @@ class Downloader:
                 stream (audio stream): audio stream with
                     the highest kbps.
         """
-        yt_vid = YouTube(url, on_progress_callback=self.bar.callback)
+        yt_vid = YouTube(url, on_progress_callback=self.callback)
         audio_stream = yt_vid.streams.filter(only_audio=True)
         return audio_stream.order_by("abr").first()
 
