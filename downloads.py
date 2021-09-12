@@ -25,7 +25,7 @@ class DownloadManager:
 
         self.downloads = [Downloader(song, path, self) for song in song_list]
 
-        stream_list = [s for s in self.downloads.stream]
+        stream_list = [d.stream for d in self.downloads]
         self.bar = ProgressBar(stream_list)
 
     def start_all(self):
