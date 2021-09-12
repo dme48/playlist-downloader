@@ -68,35 +68,20 @@ class Downloader:
         """
         self.title = title
         self.path = path
-        self.vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
-        self.vid_info = self.min_duration_video()
         self.bar = bar
 
-    def min_duration_video(self):
-        """
-        Once the query is done, selects the shortest video found.
-            Returns:
-                selected_vid (dict): Info on the shortest vid.
-        """
-        min_duration = float("inf")
-        selected_vid = None
-        for vid in self.vid_query.result()["result"]:
-            duration = str_to_sec(vid["duration"])
-            if duration < min_duration:
-                min_duration = duration
-                selected_vid = vid
-        return selected_vid
-
+        vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
+        vid_info = min_duration_video(vid_query)
+        self.stream = self.select_stream(vid_info["link"])
+        
     def download(self):
-        """Wraps call_pytube in a thread and starts it."""
-        job = threading.Thread(target=self.call_pytube)
+        """Thread wrapper around stream_download_call"""
+        job = threading.Thread(target=self.stream_download_call)
         job.start()
 
-    def call_pytube(self):
-        """Downloads an audio stream"""
-        url = self.vid_info["link"]
-        stream = self.select_stream(url)
-        stream.download(output_path=self.path)
+    def stream_download_call(self):
+        """Downloads the associated stream in path"""
+        self.stream.download(output_path=self.path)
 
     def select_stream(self, url):
         """
@@ -125,4 +110,17 @@ def str_to_sec(duration):
         count += unit
     return count
 
-
+def min_duration_video(vid_query):
+    """
+    Once the query is done, selects the shortest video found.
+        Returns:
+            selected_vid (dict): Info on the shortest vid.
+    """
+    min_duration = float("inf")
+    selected_vid = None
+    for vid in vid_query.result()["result"]:
+        duration = str_to_sec(vid["duration"])
+        if duration < min_duration:
+            min_duration = duration
+            selected_vid = vid
+    return selected_vid
