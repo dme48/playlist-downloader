@@ -23,5 +23,22 @@ class ProgressBar:
         """
         print("I received a callback")
 
-if __name__ == "__main__":
-    pb = ProgressBar()
+
+class StreamTracker:
+    """Tracks individual streams, providing information about their status"""
+    def __init__(self, stream):
+        """
+        Saves the size of the stream and sets the downloaded bytes to 0
+            Parameters:
+                stream (pytube's stream): Stream to be tracked.
+        """
+        self.TOTAL_BYTES = stream.filesize
+        self.downloaded_bytes = 0
+
+    def downloaded_percentage(self):
+        """Percentage of the stream that has been downloaded"""
+        return 100 * self.downloaded_bytes / self.TOTAL_BYTES
+
+    def update_downloaded_bytes(self, remaining_bytes):
+        """Updates self.downloaded_bytes in StreamTracker"""
+        self.downloaded_bytes = self.TOTAL_BYTES - remaining_bytes
