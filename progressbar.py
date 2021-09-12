@@ -8,8 +8,18 @@ class ProgressBar:
     and update a progress bar.
     """
     
-    def __init__(self):
-        """Inits the stream, TODO"""
+    def __init__(self, stream_list):
+        """
+        Creates a StreamTracker for every stream provided, and starts a tqdm progress bar
+            Parameters:
+                stream_list (list): List containing the (pytube) streams to be tracked.
+        """
+        self.stream_trackers = {stream: StreamTracker(stream) for stream in stream_list}
+
+        stream_sizes = [stream.STREAM_BYTES for stream in self.stream_trackers.values()]
+        self.bar = tqdm(total=sum(stream_sizes))
+
+        self.downloaded_bytes = 0
     
     def callback(self, stream, chunk, remaining_bytes):
         """
