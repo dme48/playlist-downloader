@@ -1,6 +1,7 @@
 """Container for the Downloader class"""
 import threading
 from pytube import YouTube
+from progressbar import ProgressBar
 from youtubesearchpython import VideosSearch
 
 
@@ -9,16 +10,23 @@ class DownloadManager:
 
     def __init__(self, song_list, path):
         """
-        Creates a Downloader instance for each song in song_list. Also initializes
-        the has_started list, which keeps track of which downloads have been started.
+        Creates a Downloader instance for each song in song_list.
+        Initializes the has_started list, which keeps track of which downloads have been
+        started.
+        Creates a ProgressBar, used to keep track of the state of the downloads, and feeds
+        it to the Download instances.
             Parameters:
                 song_list (string list): list with the titles of the songs to be downloaded.
                 path (string): path of the directory where the songs will be saved.
         """
         self.song_list = song_list
         self.path = path
-        self.downloads = [Downloader(song, path) for song in song_list]
         self.has_started = [False] * len(song_list)
+
+        self.downloads = [Downloader(song, path, self) for song in song_list]
+
+        stream_list = [d.stream for d in self.downloads]
+        self.bar = ProgressBar(stream_list)
 
     def start_all(self):
         """Starts all downloads that haven't started already."""
@@ -43,56 +51,60 @@ class DownloadManager:
         """Prints the song names and their indexes"""
         for i, song in enumerate(self.song_list):
             print("id: {},\ttitle: {}".format(i, song))
+    
+    def callback(self, stream, chunk, remaining_bytes):
+        """
+        Connector between the callbacks in Downloader instances and the bar.
+        See ProgressBar.callback for more info about the callback
+        """
+        if "bar" not in self.__dict__.keys():
+            raise Exception("The ProgressBar in DownloadManager should have" \
+                            "been created before callback is called.")
+
+        self.bar.callback(stream, chunk, remaining_bytes)
 
 
 class Downloader:
-    """Class that handles the download of a single video"""
+    """
+    Class that handles the download of a single video.
+    """
     TRIAL_VIDS = 3
 
-    def __init__(self, title, path):
+    def __init__(self, title, path, parent):
         """
         Querys and selects a video; sets the download as a thread.
             Parameters:
                 title (str): title of the song
                 path (str): path of the directory where the song is to ve saved
+                parent (DownloadManager): Manager of all the Downloader instances.
         """
         self.title = title
         self.path = path
-        self.vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
-        self.vid_info = self.min_duration_video()
+        self.callback = parent.callback
 
-    def min_duration_video(self):
-        """
-        Once the query is done, selects the shortest video found.
-            Returns:
-                selected_vid (dict): Info on the shortest vid.
-        """
-        min_duration = float("inf")
-        selected_vid = None
-        for vid in self.vid_query.result()["result"]:
-            duration = str_to_sec(vid["duration"])
-            if duration < min_duration:
-                min_duration = duration
-                selected_vid = vid
-        return selected_vid
-
+        vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
+        vid_info = min_duration_video(vid_query)
+        self.stream = self.select_stream(vid_info["link"])
+        
     def download(self):
-        """Wraps call_pytube in a thread and starts it."""
-        job = threading.Thread(target=self.call_pytube)
+        """Thread wrapper around stream_download_call"""
+        job = threading.Thread(target=self.stream_download_call)
         job.start()
 
-    def call_pytube(self):
-        """Downloads an audio stream"""
-        url = self.vid_info["link"]
-        stream = select_stream(url)
-        stream.download(output_path=self.path)
-        self.callback()
+    def stream_download_call(self):
+        """Downloads the associated stream in path"""
+        self.stream.download(output_path=self.path)
 
-    def callback(self):
-        """Basic callback, announces the download is over"""
-        title = self.vid_info["title"]
-        print("Song \"{}\" has finished downloading.".format(title))
-
+    def select_stream(self, url):
+        """
+        Selects an audio stream from a youtube url.
+            Returns:
+                stream (audio stream): audio stream with
+                    the highest kbps.
+        """
+        yt_vid = YouTube(url, on_progress_callback=self.callback)
+        audio_stream = yt_vid.streams.filter(only_audio=True)
+        return audio_stream.order_by("abr").first()
 
 def str_to_sec(duration):
     """
@@ -110,13 +122,17 @@ def str_to_sec(duration):
         count += unit
     return count
 
-def select_stream(url):
+def min_duration_video(vid_query):
     """
-    Selects an audio stream from a youtube url.
+    Once the query is done, selects the shortest video found.
         Returns:
-            stream (audio stream): audio stream with
-                the highest kbps.
+            selected_vid (dict): Info on the shortest vid.
     """
-    yt_vid = YouTube(url)
-    audio_stream = yt_vid.streams.filter(only_audio=True)
-    return audio_stream.order_by("abr").first()
+    min_duration = float("inf")
+    selected_vid = None
+    for vid in vid_query.result()["result"]:
+        duration = str_to_sec(vid["duration"])
+        if duration < min_duration:
+            min_duration = duration
+            selected_vid = vid
+    return selected_vid
