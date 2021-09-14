@@ -1,7 +1,7 @@
 """Container for the Downloader class"""
 import threading
 from pytube import YouTube
-from progressbar import ProgressBar
+from progressbar import DownloadProgressBar
 from youtubesearchpython import VideosSearch
 
 
@@ -13,8 +13,7 @@ class DownloadManager:
         Creates a Downloader instance for each song in song_list.
         Initializes the has_started list, which keeps track of which downloads have been
         started.
-        Creates a ProgressBar, used to keep track of the state of the downloads, and feeds
-        it to the Download instances.
+        Creates a DownloadProgressBar, used to keep track of the state of the downloads.
             Parameters:
                 song_list (string list): list with the titles of the songs to be downloaded.
                 path (string): path of the directory where the songs will be saved.
@@ -26,7 +25,7 @@ class DownloadManager:
         self.downloads = [Downloader(song, path, self) for song in song_list]
 
         stream_list = [d.stream for d in self.downloads]
-        self.bar = ProgressBar(stream_list)
+        self.bar = DownloadProgressBar(stream_list)
 
     def start_all(self):
         """Starts all downloads that haven't started already."""

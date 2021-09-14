@@ -1,9 +1,14 @@
 from tqdm import tqdm
 import time
 
-class ProgressBar:
+class QueryProgressBar:
     """
-    TODO, not implemented yet
+    QueryProgressBar displays information about the status of the queries done by
+    youtubesearchpython/VideosSearch.
+    """
+
+class DownloadProgressBar:
+    """
     ProgressBar manages information from pytube's streams and videos to show
     and update a progress bar.
     """
