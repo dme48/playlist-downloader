@@ -7,6 +7,18 @@ class QueryProgressBar:
     youtubesearchpython/VideosSearch.
     """
 
+    def __init__(self, query_size):
+        """
+        Initializes the bar
+            Parameters:
+                query_size (int): number of queries
+        """
+        self.bar = tqdm(total=query_size)
+
+    def callback(self):
+        """Increases the bar by one"""
+        self.bar.update(1)
+
 class DownloadProgressBar:
     """
     ProgressBar manages information from pytube's streams and videos to show

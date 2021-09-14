@@ -1,8 +1,8 @@
 """Container for the Downloader class"""
 import threading
 from pytube import YouTube
-from progressbar import DownloadProgressBar
 from youtubesearchpython import VideosSearch
+from progressbar import DownloadProgressBar, QueryProgressBar
 
 
 class DownloadManager:
@@ -13,7 +13,8 @@ class DownloadManager:
         Creates a Downloader instance for each song in song_list.
         Initializes the has_started list, which keeps track of which downloads have been
         started.
-        Creates a DownloadProgressBar, used to keep track of the state of the downloads.
+        Creates a QueryProgressBar and a DownloadProgressBar, used to keep track of the state of
+        the yt queries and the downloads, respectively.
             Parameters:
                 song_list (string list): list with the titles of the songs to be downloaded.
                 path (string): path of the directory where the songs will be saved.
@@ -22,10 +23,11 @@ class DownloadManager:
         self.path = path
         self.has_started = [False] * len(song_list)
 
+        self.query_bar = QueryProgressBar(len(song_list))
         self.downloads = [Downloader(song, path, self) for song in song_list]
 
         stream_list = [d.stream for d in self.downloads]
-        self.bar = DownloadProgressBar(stream_list)
+        self.download_bar = DownloadProgressBar(stream_list)
 
     def start_all(self):
         """Starts all downloads that haven't started already."""
@@ -54,13 +56,13 @@ class DownloadManager:
     def callback(self, stream, chunk, remaining_bytes):
         """
         Connector between the callbacks in Downloader instances and the bar.
-        See ProgressBar.callback for more info about the callback
+        See DownloadProgressBar.callback for more info about the callback.
         """
-        if "bar" not in self.__dict__.keys():
-            raise Exception("The ProgressBar in DownloadManager should have" \
-                            "been created before callback is called.")
+        if "download_bar" not in self.__dict__.keys():
+            raise Exception("The DownloadProgressBar in DownloadManager should" \
+                            " have been created before callback is called.")
 
-        self.bar.callback(stream, chunk, remaining_bytes)
+        self.download_bar.callback(stream, chunk, remaining_bytes)
 
 
 class Downloader:
@@ -81,10 +83,9 @@ class Downloader:
         self.path = path
         self.callback = parent.callback
 
-        vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
-        vid_info = min_duration_video(vid_query)
+        vid_info = query_vid(title, parent.query_bar)
         self.stream = self.select_stream(vid_info["link"])
-        
+
     def download(self):
         """Thread wrapper around stream_download_call"""
         job = threading.Thread(target=self.stream_download_call)
@@ -120,6 +121,18 @@ def str_to_sec(duration):
         count *= 60
         count += unit
     return count
+
+def query_vid(title, bar=None):
+    """
+    Searchs and selects a video by it's title.
+        Parameters:
+            title (str): title or searchstring for the desired video
+            bar (QueryProgressBar): if provided, the callback method inside it
+                will be called after the query
+    """
+    vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
+    if bar: bar.callback()
+    return min_duration_video(vid_query)
 
 def min_duration_video(vid_query):
     """
