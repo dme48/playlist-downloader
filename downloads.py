@@ -52,7 +52,7 @@ class DownloadManager:
         """Prints the song names and their indexes"""
         for i, song in enumerate(self.song_list):
             print("id: {},\ttitle: {}".format(i, song))
-    
+
     def callback(self, stream, chunk, remaining_bytes):
         """
         Connector between the callbacks in Downloader instances and the bar.
@@ -122,16 +122,17 @@ def str_to_sec(duration):
         count += unit
     return count
 
-def query_vid(title, bar=None):
+def query_vid(title, query_bar=None):
     """
     Searchs and selects a video by it's title.
         Parameters:
             title (str): title or searchstring for the desired video
-            bar (QueryProgressBar): if provided, the callback method inside it
+            query_bar (QueryProgressBar): if provided, the callback method inside it
                 will be called after the query
     """
     vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
-    if bar: bar.callback()
+    if query_bar:
+        query_bar.callback()
     return min_duration_video(vid_query)
 
 def min_duration_video(vid_query):

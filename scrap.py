@@ -1,19 +1,19 @@
 """Container for the Scrapper class"""
-from bs4 import BeautifulSoup
 from urllib import request
-import re
+from bs4 import BeautifulSoup
 
 class Scrapper:
+    """Class that extracts titles and artists from songs in a Spotify's url"""
     ARTIST_ALBUM_DIVIDER = "     •"
     def __init__(self, url):
         """
         Fetches the url's html and wraps it inside a BeautifulSoup instance.
             Parameters:
-                url (str): url of the Spotify's playlist 
+                url (str): url of the Spotify's playlist
         """
         html = request.urlopen(url).read().decode("utf-8")
         self.html_soup = BeautifulSoup(html, "html.parser")
-    
+
     def get_titles(self):
         """Parses the html to find all the song titles"""
         raw_songs = self.html_soup.find_all("span", "track-name")
@@ -34,11 +34,9 @@ class Scrapper:
         artists = self.get_artists()
 
         return ["{}, {}".format(t, a) for t, a in zip(titles, artists)]
-     
-        
+
 
 if __name__ == "__main__":
-    url = "https://open.spotify.com/playlist/4oJvONQDLoXaZ7TxkRUz3Q?si=d6eb4d34d95a40f6"
-    scrap = Scrapper(url)
-
+    SPOTIFY_URL = "https://open.spotify.com/playlist/4oJvONQDLoXaZ7TxkRUz3Q?si=d6eb4d34d95a40f6"
+    scrap = Scrapper(SPOTIFY_URL)
     print(scrap.get_searchstring())
