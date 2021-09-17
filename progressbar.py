@@ -37,7 +37,7 @@ class DownloadProgressBar:
         """
         self.stream_trackers = {stream: StreamTracker(stream) for stream in stream_list}
 
-        stream_sizes = [stream.STREAM_BYTES for stream in self.stream_trackers.values()]
+        stream_sizes = [tracker.filesize for tracker in self.stream_trackers.values()]
         self.download_bar = tqdm(total=sum(stream_sizes))
 
         self.downloaded_bytes = 0
