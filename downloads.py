@@ -140,6 +140,10 @@ def query_vid(title, query_bar=None):
     vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
     if query_bar:
         query_bar.callback()
+
+    if len(vid_query.result()["result"]) == 0:
+        raise ValueError("No results are found for the searchstring '{}'.".format(title))
+
     return min_duration_video(vid_query)
 
 def min_duration_video(vid_query):
