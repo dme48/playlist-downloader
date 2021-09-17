@@ -11,6 +11,7 @@ class Scrapper:
             Parameters:
                 url (str): url of the Spotify's playlist
         """
+        is_url_valid(url)
         html = request.urlopen(url).read().decode("utf-8")
         self.html_soup = BeautifulSoup(html, "html.parser")
 
@@ -34,6 +35,17 @@ class Scrapper:
         artists = self.get_artists()
 
         return ["{}, {}".format(t, a) for t, a in zip(titles, artists)]
+
+def is_url_valid(url):
+    """Checks that the url belongs to a spotify's playlist"""
+    prefixes = ["https://open.spotify.com/playlist",
+                "open.spotify.com/playlist"]
+
+    prefixes_at_start = [url.startswith(p) for p in prefixes]
+
+    if sum(prefixes_at_start) == 0:
+        raise ValueError("Url doesn't belong to a standard spotify's playlist.")
+
 
 
 if __name__ == "__main__":

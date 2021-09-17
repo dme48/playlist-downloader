@@ -22,6 +22,21 @@ class TestScrapper(unittest.TestCase):
               "Life On Mars?",
               "Alfonsina y el mar"]
 
+    def test_google_url(self):
+        """Tries to create a Scrapper instance with a google url, which should raise an exception"""
+        invalid_url = "https://www.google.com/"
+        with self.assertRaises(ValueError):
+            Scrapper(invalid_url)
+
+    def test_artist_spotify_url(self):
+        """
+        Tries to create a Scrapper instance with a spotify url belonging to an artist. Should
+        raise an exception.
+        """
+        invalid_url = "https://open.spotify.com/artist/3X3vk6cQHF0ViZeiXFLhR7"
+        with self.assertRaises(ValueError):
+            Scrapper(invalid_url)
+
     def test_artists(self):
         """Checks the artists from the playlist are as expected."""
         fetched_artists = Scrapper(self.URL).get_artists()
