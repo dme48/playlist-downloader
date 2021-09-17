@@ -14,14 +14,29 @@ class TestScrapper(unittest.TestCase):
     """
 
     URL = "https://open.spotify.com/playlist/4oJvONQDLoXaZ7TxkRUz3Q?si=d6eb4d34d95a40f6&nd=1"
+    ARTISTS = ["Enric Montefusco",
+               "Seu Jorge",
+               "Avishai Cohen"]
+
+    TITLES = ["Todo Para Todos",
+              "Life On Mars?",
+              "Alfonsina y el mar"]
 
     def test_artists(self):
-        """Checks fetched artists are the desired artists."""
-        expected_artists = ["Enric Montefusco",
-                            "Seu Jorge",
-                            "Avishai Cohen"]
+        """Checks the artists from the playlist are as expected."""
         fetched_artists = Scrapper(self.URL).get_artists()
-        self.assertEqual(expected_artists, fetched_artists)
+        self.assertEqual(self.ARTISTS, fetched_artists)
+
+    def test_titles(self):
+        """Checks the titles from the playlist are as expected."""
+        fetched_titles = Scrapper(self.URL).get_titles()
+        self.assertEqual(self.TITLES, fetched_titles)
+
+    def test_searchstring(self):
+        """Checks the titles from the playlist are as expected."""
+        searchstring = ["{}, {}".format(s, a) for s, a in zip(self.TITLES, self.ARTISTS)]
+        fetched_searchstring = Scrapper(self.URL).get_searchstring()
+        self.assertEqual(searchstring, fetched_searchstring)
 
 
 if __name__ == "__main__":
