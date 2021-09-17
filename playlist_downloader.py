@@ -27,9 +27,6 @@ if NUM_ARGS == 1:
 elif NUM_ARGS == 2:
     path = os.getcwd() + "/" + sys.argv[2]
 
-if not os.path.exists(path):
-    os.mkdir(path)
-
 playlist_titles = Scrapper(playlist_url).get_searchstring()
 
 down_manager = DownloadManager(playlist_titles, path)
