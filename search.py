@@ -13,10 +13,7 @@ class YTVideo:
     def __init__(self, searchstring, callback = None):
         search = Search(searchstring)
         url = search.results[0].watch_url
-        if callback:
-            self.vid = YouTube(url, on_progress_callback=callback)
-        else:
-            self.vid = YouTube(url)
+        self.vid = YouTube(url, on_progress_callback=callback)
 
     def get_url(self):
         """Gets the (not embeded) url of the video"""

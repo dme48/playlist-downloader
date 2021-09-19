@@ -1,7 +1,6 @@
 """Container for the Downloader class"""
 import threading
-from pytube import YouTube
-from youtubesearchpython import VideosSearch
+from search import YTVideo
 from progressbar import DownloadProgressBar, QueryProgressBar
 
 
@@ -24,7 +23,7 @@ class DownloadManager:
         self.has_started = [False] * len(song_list)
 
         self.query_bar = QueryProgressBar(len(song_list))
-        self.downloads = [Downloader(song, path, self) for song in song_list]
+        self.downloads = [Downloader(song, path, self.callback) for song in song_list]
 
         stream_list = [d.stream for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
@@ -69,9 +68,8 @@ class Downloader:
     """
     Class that handles the download of a single video.
     """
-    TRIAL_VIDS = 3
 
-    def __init__(self, title, path, parent):
+    def __init__(self, title, path, callback):
         """
         Querys and selects a video; sets the download as a thread.
             Parameters:
@@ -81,10 +79,8 @@ class Downloader:
         """
         self.title = title
         self.path = path
-        self.callback = parent.callback
-
-        vid_info = query_vid(title, parent.query_bar)
-        self.stream = self.select_stream(vid_info["link"])
+        self.video = YTVideo(title, callback)
+        self.stream = self.video.get_stream()
 
     def download(self):
         """Thread wrapper around stream_download_call"""
@@ -94,58 +90,3 @@ class Downloader:
     def stream_download_call(self):
         """Downloads the associated stream in path"""
         self.stream.download(output_path=self.path)
-
-    def select_stream(self, url):
-        """
-        Selects an audio stream from a youtube url.
-            Returns:
-                stream (audio stream): audio stream with
-                    the highest kbps.
-        """
-        yt_vid = YouTube(url, on_progress_callback=self.callback)
-        audio_stream = yt_vid.streams.filter(only_audio=True)
-        return audio_stream.order_by("abr").first()
-
-def str_to_sec(duration):
-    """
-    Converts a measure of time into its corresponding seconds
-        Parameters:
-            duration (str): The time interval. Must be specified int the format
-                (h)h:mm:ss, (m)m:ss or (s)s.
-        Returns:
-            coutn (int): Number of seconds in the interval.
-    """
-    count = 0
-    units = [int(s) for s in duration.split(":")]
-    for unit in units:
-        count *= 60
-        count += unit
-    return count
-
-def query_vid(title, query_bar=None):
-    """
-    Searchs and selects a video by it's title.
-        Parameters:
-            title (str): title or searchstring for the desired video
-            query_bar (QueryProgressBar): if provided, the callback method inside it
-                will be called after the query
-    """
-    vid_query = VideosSearch(title, limit=Downloader.TRIAL_VIDS)
-    if query_bar:
-        query_bar.callback()
-    return min_duration_video(vid_query)
-
-def min_duration_video(vid_query):
-    """
-    Once the query is done, selects the shortest video found.
-        Returns:
-            selected_vid (dict): Info on the shortest vid.
-    """
-    min_duration = float("inf")
-    selected_vid = None
-    for vid in vid_query.result()["result"]:
-        duration = str_to_sec(vid["duration"])
-        if duration < min_duration:
-            min_duration = duration
-            selected_vid = vid
-    return selected_vid
