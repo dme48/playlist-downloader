@@ -12,6 +12,8 @@ class YTVideo:
 
     def __init__(self, searchstring, callback = None):
         search = Search(searchstring)
+        if len(search.results) == 0:
+            raise ValueError("The searchstring '{}' didn't have any matches.".format(searchstring))
         url = search.results[0].watch_url
         self.vid = YouTube(url, on_progress_callback=callback)
 

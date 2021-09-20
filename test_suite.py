@@ -4,6 +4,7 @@ one representing class here (f.x. Scrapper has TestScrapper) and each function a
 (Scrapper.get_titles has test_titles).
 """
 import unittest
+from shutil import rmtree
 from pytube import YouTube
 from scrap import Scrapper
 from downloads import DownloadManager, Downloader
@@ -59,13 +60,14 @@ class TestScrapper(unittest.TestCase):
 
 class TestDownloader(unittest.TestCase):
     """Downloader class tests"""
-
-    MANAGER = DownloadManager([], "Testing")
+    PATH = "Testing"
+    MANAGER = DownloadManager([], PATH)
 
     def test_no_yt_search_matches(self):
         unusual_searchstring = "1281uy 9128u e19n wde1 2e91n82e912e8u12e"
         with self.assertRaises(ValueError):
-            Downloader(unusual_searchstring, self.MANAGER.path, self.MANAGER)
+            Downloader(unusual_searchstring, self.PATH, self.MANAGER.callback)
+        rmtree(self.PATH)
 
 if __name__ == "__main__":
     unittest.main()
