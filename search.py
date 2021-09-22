@@ -1,5 +1,17 @@
 """Container for classes and methods related to searching in youtube"""
+from inspect import signature
 from pytube import Search, YouTube
+
+def check_callback(callback):
+    """Checks that a callback has the right amount of needed arguments or that is None"""
+    DESIRED_PARAMETERS = 3
+    if callback is None:
+        return
+    param_number = len(signature(callback).parameters)
+
+    if param_number != DESIRED_PARAMETERS:
+        raise ValueError("The callback passed to YTVideo is supposed to have 3 parameters.")
+
 
 class YTVideo:
     """
@@ -11,6 +23,8 @@ class YTVideo:
     """
 
     def __init__(self, searchstring, callback = None):
+        check_callback(callback)
+
         search = Search(searchstring)
         if len(search.results) == 0:
             raise ValueError("The searchstring '{}' didn't have any matches.".format(searchstring))

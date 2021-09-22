@@ -4,9 +4,9 @@ one representing class here (f.x. Scrapper has TestScrapper) and each function a
 (Scrapper.get_titles has test_titles).
 """
 import unittest
-from shutil import rmtree
 from pytube import YouTube
 from scrap import Scrapper
+from search import YTVideo
 from downloads import DownloadManager, Downloader
 
 class TestScrapper(unittest.TestCase):
@@ -58,16 +58,26 @@ class TestScrapper(unittest.TestCase):
         fetched_searchstring = Scrapper(self.URL).get_searchstring()
         self.assertEqual(searchstring, fetched_searchstring)
 
-class TestDownloader(unittest.TestCase):
-    """Downloader class tests"""
-    PATH = "Testing"
-    MANAGER = DownloadManager([], PATH)
+class TestYTVideo(unittest.TestCase):
+    """YTVideo class tests"""
+    def CLASS_BAD_CALLBACK(self, only_one_argument):
+            return
+    @staticmethod
+    def STATIC_BAD_CALLBACK(only_one_argument):
+        return
+
 
     def test_no_yt_search_matches(self):
+        """Tries to create a YTVid with a searchstring with no associated results."""
         unusual_searchstring = "1281uy 9128u e19n wde1 2e91n82e912e8u12e"
         with self.assertRaises(ValueError):
-            Downloader(unusual_searchstring, self.PATH, self.MANAGER.callback)
-        rmtree(self.PATH)
+            YTVideo(unusual_searchstring)
+    
+    def test_bad_callbacks(self):
+        """Tries to create a YTVideo with inappropiate callback functions"""
+        with self.assertRaises(ValueError):
+            YTVideo("Hey Jude", self.CLASS_BAD_CALLBACK)
+            YTVideo("Hey Jude", self.STATIC_BAD_CALLBACK)
 
 if __name__ == "__main__":
     unittest.main()
