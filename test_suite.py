@@ -4,10 +4,9 @@ one representing class here (f.x. Scrapper has TestScrapper) and each function a
 (Scrapper.get_titles has test_titles).
 """
 import unittest
-from pytube import YouTube
 from scrap import Scrapper
 from search import YTVideo
-from downloads import DownloadManager, Downloader
+from downloads import Downloader
 
 class TestScrapper(unittest.TestCase):
     """
@@ -60,24 +59,34 @@ class TestScrapper(unittest.TestCase):
 
 class TestYTVideo(unittest.TestCase):
     """YTVideo class tests"""
-    def CLASS_BAD_CALLBACK(self, only_one_argument):
-            return
-    @staticmethod
-    def STATIC_BAD_CALLBACK(only_one_argument):
-        return
-
 
     def test_no_yt_search_matches(self):
         """Tries to create a YTVid with a searchstring with no associated results."""
         unusual_searchstring = "1281uy 9128u e19n wde1 2e91n82e912e8u12e"
         with self.assertRaises(ValueError):
             YTVideo(unusual_searchstring)
-    
+
+class TestDownloader(unittest.TestCase):
+    """Downloader class tests"""
+
+    PATH = "Testing"
+
+    def class_bad_callback(self, only_one_argument):
+        """Callback as a method with the wrong amount of arguments. Does nothing."""
+        if not self:
+            del only_one_argument
+
+    @staticmethod
+    def static_bad_callback(only_one_argument):
+        """Callback as a function with the wrong amount of arguments. Does nothing."""
+        del only_one_argument
+
     def test_bad_callbacks(self):
         """Tries to create a YTVideo with inappropiate callback functions"""
         with self.assertRaises(ValueError):
-            YTVideo("Hey Jude", self.CLASS_BAD_CALLBACK)
-            YTVideo("Hey Jude", self.STATIC_BAD_CALLBACK)
+            Downloader("Hey Jude", self.PATH, self.class_bad_callback)
+            Downloader("Hey Jude", self.PATH, self.static_bad_callback)
+
 
 if __name__ == "__main__":
     unittest.main()

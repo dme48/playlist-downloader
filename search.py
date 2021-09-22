@@ -4,12 +4,11 @@ from pytube import Search, YouTube
 
 def check_callback(callback):
     """Checks that a callback has the right amount of needed arguments or that is None"""
-    DESIRED_PARAMETERS = 3
     if callback is None:
         return
     param_number = len(signature(callback).parameters)
 
-    if param_number != DESIRED_PARAMETERS:
+    if param_number != 3:
         raise ValueError("The callback passed to YTVideo is supposed to have 3 parameters.")
 
 

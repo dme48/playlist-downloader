@@ -29,7 +29,8 @@ class DownloadManager:
         stream_list = [d.stream for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
 
-        self.__create_destination_folder(path)
+        if not os.path.exists(path):
+            os.mkdir(path)
 
     def start_all(self):
         """Starts all downloads that haven't started already."""
@@ -65,11 +66,6 @@ class DownloadManager:
                             " have been created before callback is called.")
 
         self.download_bar.callback(stream, chunk, remaining_bytes)
-
-    def __create_destination_folder(self, path):
-        """If not present, creates the folder specified by path"""
-        if not os.path.exists(path):
-            os.mkdir(path)
 
 class Downloader:
     """
