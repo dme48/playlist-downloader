@@ -6,7 +6,7 @@ one representing class here (f.x. Scrapper has TestScrapper) and each function a
 import unittest
 from scrap import Scrapper
 from search import YTVideo
-from downloads import Downloader
+from downloads import DownloadManager, Downloader
 
 class TestScrapper(unittest.TestCase):
     """
@@ -86,6 +86,18 @@ class TestDownloader(unittest.TestCase):
         with self.assertRaises(ValueError):
             Downloader("Hey Jude", self.PATH, self.class_bad_callback)
             Downloader("Hey Jude", self.PATH, self.static_bad_callback)
+
+class TestDownloadManager(unittest.TestCase):
+    """DownloadManager class tests"""
+    PATH = "Testing"
+
+    def test_empty_songlist(self):
+        with self.assertRaises(TypeError):
+            DownloadManager([], self.PATH)
+
+    def test_wrong_type_songlist(self):
+        with self.assertRaises(TypeError):
+            DownloadManager(["Hey jude", 1.3, "Purple Rain"], self.PATH)
 
 
 if __name__ == "__main__":

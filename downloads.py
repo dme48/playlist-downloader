@@ -19,6 +19,7 @@ class DownloadManager:
                 song_list (string list): list with the titles of the songs to be downloaded.
                 path (string): path of the directory where the songs will be saved.
         """
+        check_songlist(song_list)
         self.song_list = song_list
         self.path = path
         self.has_started = [False] * len(song_list)
@@ -93,3 +94,10 @@ class Downloader:
     def stream_download_call(self):
         """Downloads the associated stream in path"""
         self.stream.download(output_path=self.path)
+
+def check_songlist(song_list):
+    if not song_list:
+            raise TypeError("The song list was None or empty.")
+    for song in song_list:
+        if type(song) != "str":
+            raise TypeError("Song '{}' in song_list was not a string".format(song))
