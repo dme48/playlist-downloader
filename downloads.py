@@ -97,7 +97,7 @@ class Downloader:
 
 def check_songlist(song_list):
     if not song_list:
-            raise TypeError("The song list was None or empty.")
+        raise TypeError("The song list was None or empty.")
     for song in song_list:
-        if type(song) != "str":
+        if song.isalpha():
             raise TypeError("Song '{}' in song_list was not a string".format(song))
