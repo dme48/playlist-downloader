@@ -21,7 +21,7 @@ class DownloadManager:
         """
         check_songlist(song_list)
         self.song_list = song_list
-        self.path = path
+        self.path = path if path else f"{os.getcwd()}/Songs"
         self.has_started = [False] * len(song_list)
 
         self.query_bar = QueryProgressBar(len(song_list))

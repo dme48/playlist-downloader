@@ -15,18 +15,22 @@ from downloads import DownloadManager
 
 NUM_ARGS = len(sys.argv) - 1
 
-if NUM_ARGS >= 3:
+if NUM_ARGS >= 4:
     sys.exit("Too many arguments")
 if NUM_ARGS == 0:
     sys.exit("Not enough arguments")
 
 playlist_url = sys.argv[1]
+path = None
+selected_artist = None
 
-if NUM_ARGS == 1:
-    path = os.getcwd() + "/Songs"
-elif NUM_ARGS == 2:
-    path = os.getcwd() + "/" + sys.argv[2]
-
+for i in range(2, NUM_ARGS+1):
+    arg = sys.argv[i]
+    if arg.startswith("-d="):
+        folder = arg.split("-d=")[1]
+        path = f"{os.getcwd()}/{folder}"
+    if arg.startswith("-a="):
+        selected_artist = arg.split("-a=")[1]
 playlist_titles = Scrapper(playlist_url).get_searchstring()
 
 down_manager = DownloadManager(playlist_titles, path)
