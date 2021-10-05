@@ -31,7 +31,7 @@ class DownloadManager:
         self.download_bar = DownloadProgressBar(stream_list)
 
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.mkdir(self.path)
 
     def start_all(self):
         """Starts all downloads that haven't started already."""
