@@ -31,7 +31,8 @@ for i in range(2, NUM_ARGS+1):
         path = f"{os.getcwd()}/{folder}"
     if arg.startswith("-a="):
         selected_artist = arg.split("-a=")[1]
-playlist_titles = Scrapper(playlist_url).get_searchstring()
+
+playlist_titles = Scrapper(playlist_url, artist).get_searchstring()
 
 down_manager = DownloadManager(playlist_titles, path)
 down_manager.start_all()

@@ -5,29 +5,38 @@ from bs4 import BeautifulSoup
 class Scrapper:
     """Class that extracts titles and artists from songs in a Spotify's url"""
     ARTIST_ALBUM_DIVIDER = "     •"
-    def __init__(self, url):
+    def __init__(self, url, artist):
         """
         Fetches the url's html and wraps it inside a BeautifulSoup instance.
             Parameters:
                 url (str): url of the Spotify's playlist
         """
+        self.artist = artist
         is_url_valid(url)
         html = request.urlopen(url).read().decode("utf-8")
         self.html_soup = BeautifulSoup(html, "html.parser")
 
-    def get_titles(self):
-        """Parses the html to find all the song titles"""
+    def get_titles(self, playlist_artists=None):
+        """Parses the html to find all the song titles."""
         raw_songs = self.html_soup.find_all("span", "track-name")
-        return [tag.get_text() for tag in raw_songs]
+        clean_songs = [tag.get_text() for tag in raw_songs]
+        if self.artist and playlist_artists:
+            is_included = [is_substring_included(a, self.artist) for a in playlist_artists]
+            clean_songs = [song for song, included in zip(clean_songs, included) if included]
+        return clean_songs
 
     def get_artists(self):
         """
         Parses the html to find all the artist names. Slightly more complicated than the title
-        counterpart, since artist and albums share a string."""
+        counterpart, since artist and albums share a string.
+        """
         tag_artist_albums = self.html_soup.find_all("span", "artists-albums")
         raw_artist_albums = [tag.get_text() for tag in tag_artist_albums]
         sep = self.ARTIST_ALBUM_DIVIDER
-        return [raw.split(sep)[0] for raw in raw_artist_albums]
+        clean_artists = [raw.split(sep)[0] for raw in raw_artist_albums]
+        if self.artist:
+            clean_artists = [a for a in clean_artists if is_substring_included(a, self.artist)]
+        return clean_artists
 
     def get_searchstring(self):
         """Gets the artist and title list and combines them in a single list 'title, artist'"""
@@ -46,6 +55,9 @@ def is_url_valid(url):
     if sum(prefixes_at_start) == 0:
         raise ValueError("Url doesn't belong to a standard spotify's playlist.")
 
+def is_substring_included(mainstring, substring):
+    """Checks if substring is included in mainstring"""
+    return mainstring.find(substring) >= 0
 
 
 if __name__ == "__main__":
