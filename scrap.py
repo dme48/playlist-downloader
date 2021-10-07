@@ -63,7 +63,9 @@ def is_url_valid(url):
 
 def is_substring_included(mainstring, substring):
     """Checks if substring is included in mainstring"""
-    return mainstring.find(substring) >= 0
+    main = mainstring.lower()
+    sub = substring.lower()
+    return main.find(sub) >= 0
 
 
 if __name__ == "__main__":
