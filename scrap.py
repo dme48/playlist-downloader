@@ -17,7 +17,7 @@ class Scrapper:
         self.html_soup = BeautifulSoup(html, "html.parser")
         
         if artist:
-            self.is_included = [a for a in this.get_artists() if is_substring_included(a, artist)]
+            self.is_included = [a for a in self.get_artists() if is_substring_included(a, artist)]
 
     def get_titles(self):
         """Parses the html to find all the song titles."""
