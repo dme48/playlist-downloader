@@ -30,7 +30,7 @@ class TestScrapper(unittest.TestCase):
         """Tries to create a Scrapper instance with a google url, which should raise an exception"""
         invalid_url = "https://www.google.com/"
         with self.assertRaises(ValueError):
-            Scrapper(invalid_url)
+            Scrapper(invalid_url, None)
 
     def test_artist_spotify_url(self):
         """
@@ -39,22 +39,22 @@ class TestScrapper(unittest.TestCase):
         """
         invalid_url = "https://open.spotify.com/artist/3X3vk6cQHF0ViZeiXFLhR7"
         with self.assertRaises(ValueError):
-            Scrapper(invalid_url)
+            Scrapper(invalid_url, None)
 
     def test_artists(self):
         """Checks the artists from the playlist are as expected."""
-        fetched_artists = Scrapper(self.URL).get_artists()
+        fetched_artists = Scrapper(self.URL, None).get_artists()
         self.assertEqual(self.ARTISTS, fetched_artists)
 
     def test_titles(self):
         """Checks the titles from the playlist are as expected."""
-        fetched_titles = Scrapper(self.URL).get_titles()
+        fetched_titles = Scrapper(self.URL, None).get_titles()
         self.assertEqual(self.TITLES, fetched_titles)
 
     def test_searchstring(self):
         """Checks the titles from the playlist are as expected."""
         searchstring = ["{}, {}".format(s, a) for s, a in zip(self.TITLES, self.ARTISTS)]
-        fetched_searchstring = Scrapper(self.URL).get_searchstring()
+        fetched_searchstring = Scrapper(self.URL, None).get_searchstring()
         self.assertEqual(searchstring, fetched_searchstring)
 
 class TestYTVideo(unittest.TestCase):
@@ -92,10 +92,12 @@ class TestDownloadManager(unittest.TestCase):
     PATH = "Testing"
 
     def test_empty_songlist(self):
+        """Should raise an error when the playlist is empty"""
         with self.assertRaises(TypeError):
             DownloadManager([], self.PATH)
 
     def test_wrong_type_songlist(self):
+        """Should raise an error when some of the elements in the list are not strings"""
         with self.assertRaises(TypeError):
             DownloadManager(["Hey jude", 1.3, "Purple Rain"], self.PATH)
 

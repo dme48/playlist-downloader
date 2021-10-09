@@ -21,18 +21,18 @@ if NUM_ARGS == 0:
     sys.exit("Not enough arguments")
 
 playlist_url = sys.argv[1]
-path = None
-selected_artist = None
+PATH = None
+SELECTED_ARTIST = None
 
 for i in range(2, NUM_ARGS+1):
     arg = sys.argv[i]
     if arg.startswith("-d="):
         folder = arg.split("-d=")[1]
-        path = f"{os.getcwd()}/{folder}"
+        PATH = f"{os.getcwd()}/{folder}"
     if arg.startswith("-a="):
-        selected_artist = arg.split("-a=")[1]
+        SELECTED_ARTIST = arg.split("-a=")[1]
 
-playlist_titles = Scrapper(playlist_url, selected_artist).get_searchstring()
+playlist_titles = Scrapper(playlist_url, SELECTED_ARTIST).get_searchstring()
 
-down_manager = DownloadManager(playlist_titles, path)
+down_manager = DownloadManager(playlist_titles, PATH)
 down_manager.start_all()

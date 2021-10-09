@@ -15,7 +15,7 @@ class Scrapper:
         is_url_valid(url)
         html = request.urlopen(url).read().decode("utf-8")
         self.html_soup = BeautifulSoup(html, "html.parser")
-        
+
         if artist:
             self.is_included = [a for a in self.get_artists() if is_substring_included(a, artist)]
 
@@ -24,7 +24,7 @@ class Scrapper:
         raw_songs = self.html_soup.find_all("span", "track-name")
         clean_songs = [tag.get_text() for tag in raw_songs]
         if self.artist:
-            clean_songs = filter_by_artist(clean_songs)
+            clean_songs = self.filter_by_artist(clean_songs)
         return clean_songs
 
     def get_artists(self):
@@ -37,7 +37,7 @@ class Scrapper:
         sep = self.ARTIST_ALBUM_DIVIDER
         clean_artists = [raw.split(sep)[0] for raw in raw_artist_albums]
         if self.artist:
-            clean_artists = filter_by_artist(clean_artists)
+            clean_artists = self.filter_by_artist(clean_artists)
         return clean_artists
 
     def get_searchstring(self):
@@ -46,10 +46,10 @@ class Scrapper:
         artists = self.get_artists()
 
         return ["{}, {}".format(t, a) for t, a in zip(titles, artists)]
-    
+
     def filter_by_artist(self, string_list):
-        """Removes the elements in string_list with a corresponding False in self.included."""
-        return [item for item, included in zip(string_list, self.included) if included]
+        """Removes the elements in string_list with a corresponding False in self.is_included."""
+        return [item for item, included in zip(string_list, self.is_included) if included]
 
 def is_url_valid(url):
     """Checks that the url belongs to a spotify's playlist"""
@@ -70,5 +70,5 @@ def is_substring_included(mainstring, substring):
 
 if __name__ == "__main__":
     SPOTIFY_URL = "https://open.spotify.com/playlist/4oJvONQDLoXaZ7TxkRUz3Q?si=d6eb4d34d95a40f6"
-    scrap = Scrapper(SPOTIFY_URL)
+    scrap = Scrapper(SPOTIFY_URL, None)
     print(scrap.get_searchstring())

@@ -96,6 +96,7 @@ class Downloader:
         self.stream.download(output_path=self.path)
 
 def check_songlist(song_list):
+    """Checks that song_list is not None and that its elements are strings."""
     if not song_list:
         raise TypeError("The song list was None or empty.")
     for song in song_list:
