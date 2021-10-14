@@ -57,6 +57,24 @@ class TestScrapper(unittest.TestCase):
         fetched_searchstring = Scrapper(self.URL, None).get_searchstring()
         self.assertEqual(searchstring, fetched_searchstring)
 
+    def test_artist_filtering(self):
+        """Checks that a correctly spelled artist works as a filter"""
+        artist = self.ARTISTS[0]
+        filtered_artists = Scrapper(self.URL, artist).get_artists()
+        self.assertEqual(artist, filtered_artists[0])
+
+    def test_artists_lowercase_filtering(self):
+        """Checks that a lowercase version of an artist's name works as a filter"""
+        artist = self.ARTISTS[0]
+        filtered_artists = Scrapper(self.URL, artist.lower()).get_artists()
+        self.assertEqual(artist, filtered_artists[0])
+
+    def test_artist_not_found(self):
+        """Expects an error to be raised when the artist is not found on the list"""
+        non_present_artist = "Enrique Montefusco"
+        with self.assertRaises(ValueError):
+            Scrapper(self.URL, non_present_artist)
+
 class TestYTVideo(unittest.TestCase):
     """YTVideo class tests"""
 
