@@ -100,5 +100,5 @@ def check_songlist(song_list):
     if not song_list:
         raise TypeError("The song list was None or empty.")
     for song in song_list:
-        if type(song) != str:
-            raise TypeError(f"Song '{song}' in song_list was not a string")
+        if not isinstance(song, str):
+            raise TypeError(f"Input '{song}' in song_list was not a string")
