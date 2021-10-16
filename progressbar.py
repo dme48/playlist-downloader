@@ -7,7 +7,7 @@ class QueryProgressBar:
     youtubesearchpython/VideosSearch.
     """
 
-    def __init__(self, query_size):
+    def __init__(self, query_size: int):
         """
         Initializes the bar
             Parameters:
@@ -29,7 +29,7 @@ class DownloadProgressBar:
     and update a progress bar.
     """
 
-    def __init__(self, stream_list):
+    def __init__(self, stream_list: list):
         """
         Creates a StreamTracker for every stream provided, and starts a tqdm progress bar
             Parameters:
@@ -80,7 +80,7 @@ class StreamTracker:
         """Percentage of the stream that has been downloaded"""
         return 100 * self.downloaded_bytes / self.filesize
 
-    def update_downloaded_bytes(self, remaining_bytes):
+    def update_downloaded_bytes(self, remaining_bytes: int):
         """Updates self.downloaded_bytes in StreamTracker"""
         updated_bytes = self.filesize - remaining_bytes
         self.last_chunk_size = updated_bytes - self.downloaded_bytes

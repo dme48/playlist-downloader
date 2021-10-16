@@ -30,7 +30,7 @@ class DownloadManager:
         stream_list = [d.stream for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
 
-        if not os.path.exists(path):
+        if not os.path.exists(self.path):
             os.mkdir(self.path)
 
     def start_all(self):
