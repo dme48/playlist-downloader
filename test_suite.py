@@ -26,13 +26,13 @@ class TestScrapper(unittest.TestCase):
               "Life On Mars?",
               "Alfonsina y el mar"]
 
-    def test_google_url(self):
+    def test_google_url(self) -> None:
         """Tries to create a Scrapper instance with a google url, which should raise an exception"""
         invalid_url = "https://www.google.com/"
         with self.assertRaises(ValueError):
             Scrapper(invalid_url, None)
 
-    def test_artist_spotify_url(self):
+    def test_artist_spotify_url(self) -> None:
         """
         Tries to create a Scrapper instance with a spotify url belonging to an artist. Should
         raise an exception.
@@ -41,35 +41,35 @@ class TestScrapper(unittest.TestCase):
         with self.assertRaises(ValueError):
             Scrapper(invalid_url, None)
 
-    def test_artists(self):
+    def test_artists(self) -> None:
         """Checks the artists from the playlist are as expected."""
         fetched_artists = Scrapper(self.URL, None).get_artists()
         self.assertEqual(self.ARTISTS, fetched_artists)
 
-    def test_titles(self):
+    def test_titles(self) -> None:
         """Checks the titles from the playlist are as expected."""
         fetched_titles = Scrapper(self.URL, None).get_titles()
         self.assertEqual(self.TITLES, fetched_titles)
 
-    def test_searchstring(self):
+    def test_searchstring(self) -> None:
         """Checks the titles from the playlist are as expected."""
         searchstring = ["{}, {}".format(s, a) for s, a in zip(self.TITLES, self.ARTISTS)]
         fetched_searchstring = Scrapper(self.URL, None).get_searchstring()
         self.assertEqual(searchstring, fetched_searchstring)
 
-    def test_artist_filtering(self):
+    def test_artist_filtering(self) -> None:
         """Checks that a correctly spelled artist works as a filter"""
         artist = self.ARTISTS[0]
         filtered_artists = Scrapper(self.URL, artist).get_artists()
         self.assertEqual(artist, filtered_artists[0])
 
-    def test_artists_lowercase_filtering(self):
+    def test_artists_lowercase_filtering(self) -> None:
         """Checks that a lowercase version of an artist's name works as a filter"""
         artist = self.ARTISTS[0]
         filtered_artists = Scrapper(self.URL, artist.lower()).get_artists()
         self.assertEqual(artist, filtered_artists[0])
 
-    def test_artist_not_found(self):
+    def test_artist_not_found(self) -> None:
         """Expects an error to be raised when the artist is not found on the list"""
         non_present_artist = "Enrique Montefusco"
         with self.assertRaises(ValueError):
@@ -78,7 +78,7 @@ class TestScrapper(unittest.TestCase):
 class TestYTVideo(unittest.TestCase):
     """YTVideo class tests"""
 
-    def test_no_yt_search_matches(self):
+    def test_no_yt_search_matches(self) -> None:
         """Tries to create a YTVid with a searchstring with no associated results."""
         unusual_searchstring = "1281uy 9128u e19n wde1 2e91n82e912e8u12e"
         with self.assertRaises(ValueError):
@@ -95,11 +95,11 @@ class TestDownloader(unittest.TestCase):
             del only_one_argument
 
     @staticmethod
-    def static_bad_callback(only_one_argument):
+    def static_bad_callback(only_one_argument) -> None:
         """Callback as a function with the wrong amount of arguments. Does nothing."""
         del only_one_argument
 
-    def test_bad_callbacks(self):
+    def test_bad_callbacks(self) -> None:
         """Tries to create a YTVideo with inappropiate callback functions"""
         with self.assertRaises(ValueError):
             Downloader("Hey Jude", self.PATH, self.class_bad_callback)
@@ -109,12 +109,12 @@ class TestDownloadManager(unittest.TestCase):
     """DownloadManager class tests"""
     PATH = "Testing"
 
-    def test_empty_songlist(self):
+    def test_empty_songlist(self) -> None:
         """Should raise an error when the playlist is empty"""
         with self.assertRaises(TypeError):
             DownloadManager([], self.PATH)
 
-    def test_wrong_type_songlist(self):
+    def test_wrong_type_songlist(self) -> None:
         """Should raise an error when some of the elements in the list are not strings"""
         with self.assertRaises(TypeError):
             DownloadManager(["Hey jude", 1.3, "Purple Rain"], self.PATH)

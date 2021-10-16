@@ -1,8 +1,11 @@
 """Container for classes and methods related to searching in youtube"""
+from typing import Callable
 from inspect import signature
-from pytube import Search, YouTube
+from pytube import Search, Stream, YouTube
 
-def check_callback(callback):
+Callback = Callable[[Stream, bytes, int], None]
+
+def check_callback(callback: Callback) -> None:
     """Checks that a callback has the right amount of needed arguments or that is None"""
     if callback is None:
         return
@@ -21,7 +24,7 @@ class YTVideo:
                 progressbar.DownloadProgressBar.callback
     """
 
-    def __init__(self, searchstring, callback = None):
+    def __init__(self, searchstring, callback: Callback=None) -> None:
         check_callback(callback)
 
         search = Search(searchstring)
@@ -30,15 +33,14 @@ class YTVideo:
         url = search.results[0].watch_url
         self.vid = YouTube(url, on_progress_callback=callback)
 
-    def get_url(self):
+    def get_url(self) -> str:
         """Gets the (not embeded) url of the video"""
         return self.vid.watch_url
 
-    def get_stream(self):
+    def get_stream(self) -> Stream:
         """Returns an audio stream. Assumes the one with most quality."""
         audio_streams = self.vid.streams.filter(only_audio=True)
         return audio_streams.order_by("abr").first()
 
 if __name__ == "__main__":
     vid = YTVideo("Alfonsina y el Mar")
-    
