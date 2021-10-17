@@ -53,7 +53,6 @@ class DownloadProgressBar:
                 remaining_bytes (int): the amount of bytes that haven't been downloaded
                     yet, in the stream from the argument
         """
-        print(type(chunk))
         del chunk
         tracker = self.stream_trackers.get(stream)
         tracker.update_downloaded_bytes(remaining_bytes)
