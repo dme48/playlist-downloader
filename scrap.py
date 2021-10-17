@@ -78,7 +78,7 @@ def check_url_is_valid(url: str) -> None:
 
 def is_substring_included(main: str, sub: str) -> bool:
     """Checks if substring is included in mainstring"""
-    return main.lower().find(sub.lower) >= 0
+    return main.lower().find(sub.lower()) >= 0
 
 
 if __name__ == "__main__":
