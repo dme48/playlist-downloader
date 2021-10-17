@@ -28,7 +28,7 @@ class DownloadManager:
         self.has_started = [False] * len(song_list)
 
         self.query_bar = QueryProgressBar(len(song_list))
-        self.downloads = [Downloader(song, path, self.callback) for song in song_list]
+        self.downloads = [Downloader(song, self.path, self.callback) for song in song_list]
 
         stream_list = [d.stream for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
@@ -95,6 +95,7 @@ class Downloader:
 
     def stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
+        print(self.path)
         self.stream.download(output_path=self.path)
 
 def check_songlist(song_list: list[str]) -> None:
