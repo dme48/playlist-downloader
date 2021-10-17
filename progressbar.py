@@ -14,7 +14,8 @@ class QueryProgressBar:
             Parameters:
                 query_size (int): number of queries
         """
-        self.query_bar = tqdm(total=query_size)
+        bar_format = "Searching YT:|{bar}| {n_fmt}/{total_fmt}"
+        self.query_bar = tqdm(total=query_size, bar_format=bar_format)
 
     def callback(self) -> None:
         """Increases the bar by one"""
@@ -38,7 +39,9 @@ class DownloadProgressBar:
         self.stream_trackers = {stream: StreamTracker(stream) for stream in stream_list}
 
         stream_sizes = [tracker.filesize for tracker in self.stream_trackers.values()]
-        self.download_bar = tqdm(total=sum(stream_sizes))
+        bar_format = "Downloading: |{bar}| {desc}: {percentage:3.0f}%"
+        self.download_bar = tqdm(total=sum(stream_sizes), bar_format=bar_format)
+
 
         self.downloaded_bytes = 0
 
