@@ -95,7 +95,6 @@ class Downloader:
 
     def stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
-        print(self.path)
         self.stream.download(output_path=self.path)
 
 def check_songlist(song_list: list[str]) -> None:
