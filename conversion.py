@@ -6,17 +6,16 @@ class ConversionManager:
     """Manages the audio conversions through Converter instances"""
     def __init__(self,
                  audio_paths: list[str],
-                 new_extension: str,
-                 delete_originals: bool=False) -> None:
+                 new_extension: str) -> None:
         """Checks the paths and creates the converters"""
         check_paths(audio_paths)
         self.converters = [Converter(path) for path in audio_paths]
-        # TODO start conversors
-        # TODO delete originals if specified
+        self.new_extension = new_extension
 
     def convert_all(self, new_extension) -> None:
         """Starts the conversion on all files."""
-        # TODO implement
+        for converter in self.converters:
+            converter.convert_to(new_extension)
 
     def delete_originals(self) -> None:
         """Deletes all the original files"""
