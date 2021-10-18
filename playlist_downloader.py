@@ -15,8 +15,6 @@ from downloads import DownloadManager
 
 NUM_ARGS = len(sys.argv) - 1
 
-if NUM_ARGS >= 4:
-    sys.exit("Too many arguments")
 if NUM_ARGS == 0:
     sys.exit("Not enough arguments")
 
@@ -32,14 +30,14 @@ for i in range(2, NUM_ARGS+1):
         PATH = f"{os.getcwd()}/{folder}"
     if arg.startswith("-a="):
         SELECTED_ARTIST = arg.split("-a=")[1]
-    if arg.startswith("-f=")
+    if arg.startswith("-f="):
         NEW_EXTENSION = arg.split("-f=")[1]
 
 playlist_titles = Scrapper(playlist_url, SELECTED_ARTIST).get_searchstring()
 
 down_manager = DownloadManager(playlist_titles, PATH)
 down_manager.start_all()
-# audio_paths = down_manager.get_file_paths()
+audio_paths = down_manager.get_file_paths()
 
 if NEW_EXTENSION:
-    conv_manager = ConversionManager([], "mp3")
+    conv_manager = ConversionManager(audio_paths, "mp3")
