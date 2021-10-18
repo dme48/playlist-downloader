@@ -60,6 +60,19 @@ class DownloadManager:
         for i, song in enumerate(self.song_list):
             print("id: {},\ttitle: {}".format(i, song))
 
+    def get_file_paths(self) -> None:
+        """Returns the audio file paths; can only be called after downloads are finished"""
+        if not self.is_download_complete():
+            raise ValueError("Can't get file paths until audio files have been downloaded.")
+        return [d.get_filename for d in self.downloads]
+
+    def is_download_complete(self) -> None:
+        """Checks every Downloader has finished downloading its song"""
+        for download in self.downloads:
+            if not download.finished:
+                return False
+            return True
+
     def callback(self, stream: Stream, chunk: bytes, remaining_bytes: int):
         """
         Connector between the callbacks in Downloader instances and the bar.
@@ -80,13 +93,15 @@ class Downloader:
         Querys and selects a video; sets the download as a thread.
             Parameters:
                 title (str): title of the song
-                path (str): path of the directory where the song is to ve saved
-                parent (DownloadManager): Manager of all the Downloader instances.
+                path (str): path of the directory where the song is to be saved
+                callback (function): callback for pytube. See DownloadProgressBar.callback
         """
         self.title = title
         self.path = path
-        self.video = YTVideo(title, callback)
-        self.stream = self.video.get_stream()
+        video = YTVideo(title, callback)
+        self.title = video.vid.title
+        self.stream = video.get_stream()
+        self.finished = False
 
     def download(self) -> None:
         """Thread wrapper around stream_download_call"""
@@ -96,6 +111,14 @@ class Downloader:
     def stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
         self.stream.download(output_path=self.path)
+        self.finished = True
+
+    def get_filename(self) -> None:
+        """Returns the path of the downloaded song. Currently adds mp4 as ext. without checking"""
+        if not self.finished:
+            raise ValueError("Song must be downloaded before the path is returned.")
+        return f"{self.path}{self.title}.mp4"
+
 
 def check_songlist(song_list: list[str]) -> None:
     """Checks that song_list is not None and that its elements are strings."""
