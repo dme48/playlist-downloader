@@ -23,6 +23,7 @@ if NUM_ARGS == 0:
 playlist_url = sys.argv[1]
 PATH = None
 SELECTED_ARTIST = None
+NEW_EXTENSION = None
 
 for i in range(2, NUM_ARGS+1):
     arg = sys.argv[i]
@@ -31,8 +32,14 @@ for i in range(2, NUM_ARGS+1):
         PATH = f"{os.getcwd()}/{folder}"
     if arg.startswith("-a="):
         SELECTED_ARTIST = arg.split("-a=")[1]
+    if arg.startswith("-f=")
+        NEW_EXTENSION = arg.split("-f=")[1]
 
 playlist_titles = Scrapper(playlist_url, SELECTED_ARTIST).get_searchstring()
 
 down_manager = DownloadManager(playlist_titles, PATH)
 down_manager.start_all()
+# audio_paths = down_manager.get_file_paths()
+
+if NEW_EXTENSION:
+    conv_manager = ConversionManager([], "mp3")
