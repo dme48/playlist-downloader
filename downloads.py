@@ -45,21 +45,6 @@ class DownloadManager:
             self.downloads[i].download()
             self.has_started[i] = True
 
-    def start_by_id(self, index: int) -> None:
-        """Starts the download of the song with the indicated id."""
-        self.downloads[index].download()
-        self.has_started[index] = True
-
-    def start_by_name(self, song_name: str) -> None:
-        """Starts the download of the song with the indicated name."""
-        index = self.song_list.index(song_name)
-        self.start_by_id(index)
-
-    def print_song_id(self) -> None:
-        """Prints the song names and their indexes"""
-        for i, song in enumerate(self.song_list):
-            print("id: {},\ttitle: {}".format(i, song))
-
     def get_file_paths(self) -> None:
         """Returns the audio file paths; can only be called after downloads are finished"""
         if not self.is_download_complete():
