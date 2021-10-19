@@ -87,7 +87,16 @@ class TestYTVideo(unittest.TestCase):
 class TestDownloader(unittest.TestCase):
     """Downloader class tests"""
 
+    TITLE = "Hey Jude"
     PATH = "Testing"
+    CALLBACK = lambda self, x, y, z: None
+
+    def test_multiple_calls_to_donwload(self) -> None:
+        """Should raise an error when star_all is called multiple times"""
+        downloader = Downloader(self.TITLE, self.PATH, self.CALLBACK)
+        with self.assertRaises(ValueError):
+            downloader.download()
+            downloader.download()
 
     def class_bad_callback(self, only_one_argument):
         """Callback as a method with the wrong amount of arguments. Does nothing."""
