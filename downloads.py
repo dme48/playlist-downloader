@@ -91,10 +91,10 @@ class Downloader:
         if self.started:
             raise ValueError("The download has already started.")
         self.started = True
-        job = threading.Thread(target=self.stream_download_call)
+        job = threading.Thread(target=self._stream_download_call)
         job.start()
 
-    def stream_download_call(self) -> None:
+    def _stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
         self.stream.download(output_path=self.path)
         self.finished = True
