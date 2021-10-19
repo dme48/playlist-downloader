@@ -25,7 +25,7 @@ class DownloadManager:
         check_songlist(song_list)
         self.song_list = song_list
         self.path = path if path else f"{os.getcwd()}/Songs"
-        self.has_started = [False] * len(song_list)
+        self.has_started = False
 
         self.query_bar = QueryProgressBar(len(song_list))
         self.downloads = [Downloader(song, self.path, self.callback) for song in song_list]
@@ -38,12 +38,11 @@ class DownloadManager:
 
     def start_all(self) -> None:
         """Starts all downloads that haven't started already."""
-        num_songs = len(self.song_list)
-        for i in range(num_songs):
-            if self.has_started[i]:
-                continue
-            self.downloads[i].download()
-            self.has_started[i] = True
+        if self.has_started:
+            raise ValueError("Downloads have already started and or finished.")
+        for downloader in self.downloads:
+            downloader.download()
+        self.has_started = True
 
     def get_file_paths(self) -> None:
         """Returns the audio file paths; can only be called after downloads are finished"""
