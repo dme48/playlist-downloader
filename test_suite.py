@@ -108,6 +108,7 @@ class TestDownloader(unittest.TestCase):
 class TestDownloadManager(unittest.TestCase):
     """DownloadManager class tests"""
     PATH = "Testing"
+    SEARCHSTRINGS = ["Hey Jude", "Purple Rain", "Stairway to Heaven"]
 
     def test_empty_songlist(self) -> None:
         """Should raise an error when the playlist is empty"""
@@ -116,8 +117,10 @@ class TestDownloadManager(unittest.TestCase):
 
     def test_wrong_type_songlist(self) -> None:
         """Should raise an error when some of the elements in the list are not strings"""
+        bad_songlist = self.SEARCHSTRINGS.copy()
+        bad_songlist[0] = 1.3
         with self.assertRaises(TypeError):
-            DownloadManager(["Hey jude", 1.3, "Purple Rain"], self.PATH)
+            DownloadManager(bad_songlist, self.PATH)
 
 
 if __name__ == "__main__":

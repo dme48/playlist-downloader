@@ -38,8 +38,6 @@ class DownloadManager:
 
     def start_all(self) -> None:
         """Starts all downloads that haven't started already."""
-        if self.has_started:
-            raise ValueError("Downloads have already started and or finished.")
         for downloader in self.downloads:
             downloader.download()
         self.has_started = True
@@ -85,10 +83,14 @@ class Downloader:
         video = YTVideo(title, callback)
         self.title = video.vid.title
         self.stream = video.get_stream()
+        self.started = False
         self.finished = False
 
     def download(self) -> None:
         """Thread wrapper around stream_download_call"""
+        if self.started:
+            raise ValueError("The download has already started.")
+        self.started = True
         job = threading.Thread(target=self.stream_download_call)
         job.start()
 
