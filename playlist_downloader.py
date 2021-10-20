@@ -42,4 +42,6 @@ down_manager.wait_until_finished()
 audio_paths = down_manager.get_file_paths()
 
 if NEW_EXTENSION:
-    conv_manager = ConversionManager(audio_paths, "mp3")
+    conv_manager = ConversionManager(audio_paths)
+    conv_manager.convert_all("mp3")
+    conv_manager.delete_originals()
