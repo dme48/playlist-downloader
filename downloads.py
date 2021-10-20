@@ -30,7 +30,7 @@ class DownloadManager:
         self.query_bar = QueryProgressBar(len(song_list))
         self.downloads = [Downloader(song, self.path, self.callback) for song in song_list]
 
-        stream_list = [d.stream for d in self.downloads]
+        stream_list = [d.stream() for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
 
         if not os.path.exists(self.path):
@@ -83,6 +83,13 @@ class Downloader:
         self.video = YTVideo(title, callback)
         self.started = False
         self.finished = False
+
+    def stream(self) -> Stream:
+        """
+        Returns the stream associated to the video. The stream is saved at video's cache, so after
+        the first call, get_stream is unexpensive to call.
+        """
+        return self.video.get_stream()
 
     def download(self) -> None:
         """Thread wrapper around stream_download_call"""
