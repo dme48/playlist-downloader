@@ -1,35 +1,46 @@
 #!/usr/bin/python
 """Searches and downloads a playlist"""
-import os
 import sys
 from scrap import Scrapper
 from downloads import DownloadManager
 
-def main() -> None:
-    """Downloads the songs inside a playlist."""
-    NUM_ARGS = len(sys.argv) - 1
 
-    if NUM_ARGS >= 4:
-        sys.exit("Too many arguments")
+def main(url: str,
+         artist: str,
+         path: str) -> None:
+    """
+    Downloads the songs inside a playlist.
+    Parameters:
+        url (str): url link to a Spotify's playlist. Can be obtained inside spotify's desktop
+            app by right-clicking --> Share --> Copy Spotify URL.
+        selected_artist (str): if different than None, only the songs with an artist containing
+            selected_artist will be downloaded (case insensitive)
+        path (str): Folder to download the songs into. If it doesn't exist it will be created.
+    """
+    if not url:
+        raise TypeError("A valid url must be provided.")
+    path = path if path else "Songs/"
+
+    playlist_titles = Scrapper(url, artist).get_searchstring()
+
+    down_manager = DownloadManager(playlist_titles, path)
+    down_manager.start_all()
+
+
+if __name__ == "__main__":
     if NUM_ARGS == 0:
         sys.exit("Not enough arguments")
 
-    playlist_url = sys.argv[1]
-    PATH = None
-    SELECTED_ARTIST = None
+    url = None
+    path = None
+    artist = None
 
-    for i in range(2, NUM_ARGS+1):
-        arg = sys.argv[i]
+    for arg in sys.argv[1:]:
+        if arg.startswith("https"):
+            url = arg
         if arg.startswith("-d="):
-            folder = arg.split("-d=")[1]
-            PATH = f"{os.getcwd()}/{folder}"
+            path = arg.split("-d=")[1]
         if arg.startswith("-a="):
-            SELECTED_ARTIST = arg.split("-a=")[1]
+            artist = arg.split("-a=")[1]
 
-    playlist_titles = Scrapper(playlist_url, SELECTED_ARTIST).get_searchstring()
-
-    down_manager = DownloadManager(playlist_titles, PATH)
-    down_manager.start_all()
-
-if __name__ == "__main__":
-    main()
+    main(url, artist, path)
