@@ -51,9 +51,7 @@ class DownloadManager:
 
     def get_file_paths(self) -> None:
         """Returns the audio file paths; can only be called after downloads are finished"""
-        if not self.is_download_complete():
-            raise ValueError("Can't get file paths until audio files have been downloaded.")
-        return [d.get_filename() for d in self.downloads]
+        return [d.get_absolute_filename() for d in self.downloads]
 
     def is_download_complete(self) -> None:
         """Checks every Downloader has finished downloading its song"""
@@ -101,25 +99,23 @@ class Downloader:
 
     def download(self) -> None:
         """Thread wrapper around stream_download_call"""
-        if self.started:
-            raise ValueError("The download has already started.")
-        self.started = True
         self.job = threading.Thread(target=self._stream_download_call)
         self.job.start()
 
     def _stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
         stream = self.video.get_stream()
-        stream.download(output_path=self.path)
-        self.finished = True
+        stream.download(output_path=self.path, filename = self.get_filename())
 
     def get_filename(self) -> None:
-        """Returns the path of the downloaded song. Currently adds mp4 as ext. without checking"""
-        if not self.finished:
-            raise ValueError("Song must be downloaded before the path is returned.")
+        """Returns the relative path of the downloaded song."""
         filename = self.video.vid.title
         ext = self.video.get_format()
-        return f"{self.path}{filename}.{ext}"
+        return f"{filename}.{ext}"
+
+    def get_absolute_filename(self) -> str:
+        """Returns the absolute path of the downloaded song."""
+        return self.path + self.get_filename()
 
 
 def check_songlist(song_list: list[str]) -> None:
