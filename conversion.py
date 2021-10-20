@@ -4,13 +4,10 @@ from pydub import AudioSegment
 
 class ConversionManager:
     """Manages the audio conversions through Converter instances"""
-    def __init__(self,
-                 audio_paths: list[str],
-                 new_extension: str) -> None:
+    def __init__(self, audio_paths: list[str]) -> None:
         """Checks the paths and creates the converters"""
         check_paths(audio_paths)
         self.converters = [Converter(path) for path in audio_paths]
-        self.new_extension = new_extension
 
     def convert_all(self, new_extension) -> None:
         """Starts the conversion on all files."""
@@ -27,15 +24,14 @@ class Converter:
     def __init__(self, path: str) -> None:
         """Parses the original name and extension"""
         self.original_path = path
-        absolut_path, extension = os.path.splitext(path)
-        self.file_no_extension = absolut_path + "/"
+        self.filename, extension = os.path.splitext(path)
         self.original_extension = extension.split(".")[1]
 
     def convert_to(self, new_extension: str) -> None:
         """Converts the original file to the new_extension format"""
-        out_file = f"{self.file_no_extension}.{new_extension}"
+        new_file = f"{self.filename}.{new_extension}"
         original_audio = AudioSegment.from_file(self.original_path, format=self.original_extension)
-        original_audio.export(out_file, format=new_extension)
+        original_audio.export(new_file, format=new_extension)
 
     def delete_original(self) -> None:
         """Deletes the original file"""
