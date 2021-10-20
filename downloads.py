@@ -24,13 +24,13 @@ class DownloadManager:
         """
         check_songlist(song_list)
         self.song_list = song_list
-        self.path = path if path else f"{os.getcwd()}/Songs"
-        self.has_started = [False] * len(song_list)
+        self.path = path if path.endswith("/") else path + "/"
+        self.has_started = False
 
         self.query_bar = QueryProgressBar(len(song_list))
         self.downloads = [Downloader(song, self.path, self.callback) for song in song_list]
 
-        stream_list = [d.stream for d in self.downloads]
+        stream_list = [d.stream() for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
 
         if not os.path.exists(self.path):
@@ -38,27 +38,27 @@ class DownloadManager:
 
     def start_all(self) -> None:
         """Starts all downloads that haven't started already."""
-        num_songs = len(self.song_list)
-        for i in range(num_songs):
-            if self.has_started[i]:
-                continue
-            self.downloads[i].download()
-            self.has_started[i] = True
+        for downloader in self.downloads:
+            downloader.download()
+        self.has_started = True
 
-    def start_by_id(self, index: int) -> None:
-        """Starts the download of the song with the indicated id."""
-        self.downloads[index].download()
-        self.has_started[index] = True
+    def wait_until_finished(self) -> None:
+        """Waits until all the Downloader threads have finished"""
+        for downloader in self.downloads:
+            if not downloader.job:
+                raise ValueError(f"Download at {downloader} hasn't been called; can't wait for it to finish.")
+            downloader.job.join()
 
-    def start_by_name(self, song_name: str) -> None:
-        """Starts the download of the song with the indicated name."""
-        index = self.song_list.index(song_name)
-        self.start_by_id(index)
+    def get_file_paths(self) -> None:
+        """Returns the audio file paths; can only be called after downloads are finished"""
+        return [d.get_absolute_filename() for d in self.downloads]
 
-    def print_song_id(self) -> None:
-        """Prints the song names and their indexes"""
-        for i, song in enumerate(self.song_list):
-            print("id: {},\ttitle: {}".format(i, song))
+    def is_download_complete(self) -> None:
+        """Checks every Downloader has finished downloading its song"""
+        for download in self.downloads:
+            if not download.finished:
+                return False
+            return True
 
     def callback(self, stream: Stream, chunk: bytes, remaining_bytes: int):
         """
@@ -80,22 +80,41 @@ class Downloader:
         Querys and selects a video; sets the download as a thread.
             Parameters:
                 title (str): title of the song
-                path (str): path of the directory where the song is to ve saved
-                parent (DownloadManager): Manager of all the Downloader instances.
+                path (str): path of the directory where the song is to be saved
+                callback (function): callback for pytube. See DownloadProgressBar.callback
         """
         self.title = title
         self.path = path
         self.video = YTVideo(title, callback)
-        self.stream = self.video.get_stream()
+        self.job = None
+
+    def stream(self) -> Stream:
+        """
+        Returns the stream associated to the video. The stream is saved at video's cache, so after
+        the first call, get_stream is unexpensive to call.
+        """
+        return self.video.get_stream()
 
     def download(self) -> None:
         """Thread wrapper around stream_download_call"""
-        job = threading.Thread(target=self.stream_download_call)
-        job.start()
+        self.job = threading.Thread(target=self._stream_download_call)
+        self.job.start()
 
-    def stream_download_call(self) -> None:
+    def _stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
-        self.stream.download(output_path=self.path)
+        stream = self.video.get_stream()
+        stream.download(output_path=self.path, filename = self.get_filename())
+
+    def get_filename(self) -> None:
+        """Returns the relative path of the downloaded song."""
+        filename = self.video.vid.title
+        ext = self.video.get_format()
+        return f"{filename}.{ext}"
+
+    def get_absolute_filename(self) -> str:
+        """Returns the absolute path of the downloaded song."""
+        return self.path + self.get_filename()
+
 
 def check_songlist(song_list: list[str]) -> None:
     """Checks that song_list is not None and that its elements are strings."""

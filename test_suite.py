@@ -87,7 +87,16 @@ class TestYTVideo(unittest.TestCase):
 class TestDownloader(unittest.TestCase):
     """Downloader class tests"""
 
+    TITLE = "Hey Jude"
     PATH = "Testing"
+    CALLBACK = lambda self, x, y, z: None
+
+    def test_multiple_calls_to_donwload(self) -> None:
+        """Should raise an error when star_all is called multiple times"""
+        downloader = Downloader(self.TITLE, self.PATH, self.CALLBACK)
+        with self.assertRaises(ValueError):
+            downloader.download()
+            downloader.download()
 
     def class_bad_callback(self, only_one_argument):
         """Callback as a method with the wrong amount of arguments. Does nothing."""
@@ -108,6 +117,7 @@ class TestDownloader(unittest.TestCase):
 class TestDownloadManager(unittest.TestCase):
     """DownloadManager class tests"""
     PATH = "Testing"
+    SEARCHSTRINGS = ["Hey Jude", "Purple Rain", "Stairway to Heaven"]
 
     def test_empty_songlist(self) -> None:
         """Should raise an error when the playlist is empty"""
@@ -116,8 +126,10 @@ class TestDownloadManager(unittest.TestCase):
 
     def test_wrong_type_songlist(self) -> None:
         """Should raise an error when some of the elements in the list are not strings"""
+        bad_songlist = self.SEARCHSTRINGS.copy()
+        bad_songlist[0] = 1.3
         with self.assertRaises(TypeError):
-            DownloadManager(["Hey jude", 1.3, "Purple Rain"], self.PATH)
+            DownloadManager(bad_songlist, self.PATH)
 
 
 if __name__ == "__main__":
