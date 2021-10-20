@@ -97,6 +97,8 @@ class Downloader:
 
     def download(self) -> None:
         """Thread wrapper around stream_download_call"""
+        if self.job:
+            raise ValueError(f"Download already at progress\nVid:{self.get_filename}")
         self.job = threading.Thread(target=self._stream_download_call)
         self.job.start()
 
