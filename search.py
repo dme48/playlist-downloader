@@ -1,7 +1,7 @@
 """Container for classes and methods related to searching in youtube"""
 from typing import Callable
 from inspect import signature
-from pytube import Search, Stream, YouTube
+from pytube import Search, Stream
 
 Callback = Callable[[Stream, bytes, int], None]
 
@@ -24,14 +24,13 @@ class YTVideo:
                 progressbar.DownloadProgressBar.callback
     """
 
-    def __init__(self, searchstring, callback: Callback=None) -> None:
+    def __init__(self, searchstring: str, callback: Callback=None) -> None:
         check_callback(callback)
 
         search = Search(searchstring)
         if len(search.results) == 0:
-            raise ValueError("The searchstring '{}' didn't have any matches.".format(searchstring))
-        url = search.results[0].watch_url
-        self.vid = YouTube(url, on_progress_callback=callback)
+            raise ValueError(f"The searchstring '{searchstring}' didn't have any matches.")
+        self.vid = search.results[0]
 
     def get_url(self) -> str:
         """Gets the (not embeded) url of the video"""
