@@ -29,9 +29,6 @@ def main(url: str,
 
     down_manager = DownloadManager(playlist_titles, path)
     down_manager.start_all()
-
-    down_manager = DownloadManager(playlist_titles, PATH)
-    down_manager.start_all()
     down_manager.wait_until_finished()
     audio_paths = down_manager.get_file_paths()
 
