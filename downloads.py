@@ -46,7 +46,7 @@ class DownloadManager:
         """Waits until all the Downloader threads have finished"""
         for downloader in self.downloads:
             if not downloader.job:
-                raise ValueError(f"Download at {downloader} hasn't been called; can't wait for it to finish.")
+                raise ValueError(f"Download at {downloader} hasn't been called yet")
             downloader.job.join()
 
     def get_file_paths(self) -> None:

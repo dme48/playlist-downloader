@@ -48,8 +48,8 @@ class YTVideo:
 
     def get_format(self) -> str:
         """Returns the format associated with the selected stream"""
-        stream = self.get_stream()
-        return stream.mime_type.split("/")[1]
+        raw_type = self.get_stream().mime_type
+        return raw_type.split("/")[1]
 
 if __name__ == "__main__":
     vid = YTVideo("Alfonsina y el Mar")
