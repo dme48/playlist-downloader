@@ -32,14 +32,25 @@ class YTVideo:
             raise ValueError(f"The searchstring '{searchstring}' didn't have any matches.")
         self.vid = search.results[0]
 
+        # It takes time to get the stream, will only fetch through get_stream or get_format
+        self.stream = None
+
     def get_url(self) -> str:
         """Gets the (not embeded) url of the video"""
         return self.vid.watch_url
 
     def get_stream(self) -> Stream:
-        """Returns an audio stream. Assumes the one with most quality."""
-        audio_streams = self.vid.streams.filter(only_audio=True)
-        return audio_streams.order_by("abr").first()
+        """Returns the audio stream with most quality."""
+        if not self.stream:
+            audio_streams = self.vid.streams.filter(only_audio=True)
+            self.stream = audio_streams.order_by("abr").first()
+        return self.stream
+
+    def get_format(self) -> str:
+        s = self.get_stream()
+        return s.mime_type.split("/")[1]
 
 if __name__ == "__main__":
     vid = YTVideo("Alfonsina y el Mar")
+    url = vid.get_url()
+    stream = vid.get_stream()
