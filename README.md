@@ -10,8 +10,9 @@ If no options are provided, the program creates a `Songs` folder and downloads a
 
 ## Options
 
-    -d=<destination_folder>              Destination folder for the downloaded songs. Will
-                                         be created if not present. Defaults to "Songs".
+    -p=<destination_folder>              Path of the destination folder for the downloaded
+                                         songs. Will be created if not present. Defaults
+                                         to "Songs/".
     -a=<author>                          Filters the songs at the playlist by author,
                                          downloading only those whose author matches
                                          <author> (case insensitive).
