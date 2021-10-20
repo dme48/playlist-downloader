@@ -86,8 +86,6 @@ class Downloader:
         self.title = title
         self.path = path
         self.video = YTVideo(title, callback)
-        self.started = False
-        self.finished = False
         self.job = None
 
     def stream(self) -> Stream:
