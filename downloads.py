@@ -24,7 +24,7 @@ class DownloadManager:
         """
         check_songlist(song_list)
         self.song_list = song_list
-        self.path = path if path else f"{os.getcwd()}/Songs"
+        self.path = path if path.endswith("/") else path + "/"
         self.has_started = False
 
         self.query_bar = QueryProgressBar(len(song_list))
@@ -80,9 +80,7 @@ class Downloader:
         """
         self.title = title
         self.path = path
-        video = YTVideo(title, callback)
-        self.title = video.vid.title
-        self.stream = video.get_stream()
+        self.video = YTVideo(title, callback)
         self.started = False
         self.finished = False
 
@@ -96,14 +94,17 @@ class Downloader:
 
     def _stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
-        self.stream.download(output_path=self.path)
+        stream = self.video.get_stream()
+        stream.download(output_path=self.path)
         self.finished = True
 
     def get_filename(self) -> None:
         """Returns the path of the downloaded song. Currently adds mp4 as ext. without checking"""
         if not self.finished:
             raise ValueError("Song must be downloaded before the path is returned.")
-        return f"{self.path}{self.title}.mp4"
+        filename = self.video.vid.title
+        ext = self.video.get_format()
+        return f"{self.path}{filename}.{ext}"
 
 
 def check_songlist(song_list: list[str]) -> None:
