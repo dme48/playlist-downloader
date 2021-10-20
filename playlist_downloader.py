@@ -1,6 +1,7 @@
 #!/usr/bin/python
 """Searches and downloads a playlist"""
 import sys
+import argparse
 from scrap import Scrapper
 from downloads import DownloadManager
 
@@ -13,7 +14,7 @@ def main(url: str,
     Parameters:
         url (str): url link to a Spotify's playlist. Can be obtained inside spotify's desktop
             app by right-clicking --> Share --> Copy Spotify URL.
-        selected_artist (str): if different than None, only the songs with an artist containing
+        artist (str): if different than None, only the songs with an artist containing
             selected_artist will be downloaded (case insensitive)
         path (str): Folder to download the songs into. If it doesn't exist it will be created.
     """
@@ -28,19 +29,13 @@ def main(url: str,
 
 
 if __name__ == "__main__":
-    if NUM_ARGS == 0:
-        sys.exit("Not enough arguments")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('url')
+    parser.add_argument('-p', '--path')
+    parser.add_argument('-a', '--artist')
 
-    url = None
-    path = None
-    artist = None
+    parsed_args = parser.parse_args(sys.argv[1:])
 
-    for arg in sys.argv[1:]:
-        if arg.startswith("https"):
-            url = arg
-        if arg.startswith("-d="):
-            path = arg.split("-d=")[1]
-        if arg.startswith("-a="):
-            artist = arg.split("-a=")[1]
-
-    main(url, artist, path)
+    main(parsed_args.url,
+         parsed_args.artist,
+         parsed_args.path)
