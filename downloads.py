@@ -53,7 +53,7 @@ class DownloadManager:
         """Returns the audio file paths; can only be called after downloads are finished"""
         if not self.is_download_complete():
             raise ValueError("Can't get file paths until audio files have been downloaded.")
-        return [d.get_filename for d in self.downloads]
+        return [d.get_filename() for d in self.downloads]
 
     def is_download_complete(self) -> None:
         """Checks every Downloader has finished downloading its song"""
