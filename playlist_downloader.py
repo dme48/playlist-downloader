@@ -11,6 +11,7 @@ import os
 import sys
 from scrap import Scrapper
 from downloads import DownloadManager
+from conversion import ConversionManager
 
 
 NUM_ARGS = len(sys.argv) - 1
@@ -37,6 +38,7 @@ playlist_titles = Scrapper(playlist_url, SELECTED_ARTIST).get_searchstring()
 
 down_manager = DownloadManager(playlist_titles, PATH)
 down_manager.start_all()
+down_manager.wait_until_finished()
 audio_paths = down_manager.get_file_paths()
 
 if NEW_EXTENSION:

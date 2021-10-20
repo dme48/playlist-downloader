@@ -42,6 +42,13 @@ class DownloadManager:
             downloader.download()
         self.has_started = True
 
+    def wait_until_finished(self) -> None:
+        """Waits until all the Downloader threads have finished"""
+        for downloader in self.downloads:
+            if not downloader.job:
+                raise ValueError(f"Download at {downloader} hasn't been called; can't wait for it to finish.")
+            downloader.job.join()
+
     def get_file_paths(self) -> None:
         """Returns the audio file paths; can only be called after downloads are finished"""
         if not self.is_download_complete():
@@ -83,6 +90,7 @@ class Downloader:
         self.video = YTVideo(title, callback)
         self.started = False
         self.finished = False
+        self.job = None
 
     def stream(self) -> Stream:
         """
@@ -96,8 +104,8 @@ class Downloader:
         if self.started:
             raise ValueError("The download has already started.")
         self.started = True
-        job = threading.Thread(target=self._stream_download_call)
-        job.start()
+        self.job = threading.Thread(target=self._stream_download_call)
+        self.job.start()
 
     def _stream_download_call(self) -> None:
         """Downloads the associated stream in path"""
