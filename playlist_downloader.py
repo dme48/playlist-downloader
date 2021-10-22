@@ -45,13 +45,16 @@ def main(url: str,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('url',
+                        type=str,
                         help="Spotify's playlist")
     parser.add_argument('-p', '--path', metavar="DESTINATION_PATH",
                         help="Path of the directory songs are downloaded into.")
     parser.add_argument('-a', '--artist',
+                        type=str,
                         help="Artist to be filter songs by; if indicated only songs by ARTIST \
                               are downloaded")
     parser.add_argument('-e', '--extension',
+                        type=str,
                         help="Desired audio extension for the downloaded files. By default, the \
                               original format of the youtube's video audio; typically mp4.")
     parser.add_argument('--append', 
