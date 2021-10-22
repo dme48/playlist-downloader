@@ -33,7 +33,7 @@ class YTVideo:
         self.vid = search.results[0]
 
         # It takes time to get the stream, will only fetch through get_stream or get_format
-        self.stream = None
+        self._cached_stream = None
 
     def get_url(self) -> str:
         """Gets the (not embeded) url of the video"""
@@ -41,10 +41,10 @@ class YTVideo:
 
     def get_stream(self) -> Stream:
         """Returns the audio stream with most quality."""
-        if not self.stream:
+        if not self._cached_stream:
             audio_streams = self.vid.streams.filter(only_audio=True)
-            self.stream = audio_streams.order_by("abr").first()
-        return self.stream
+            self._cached_stream = audio_streams.order_by("abr").first()
+        return self._cached_stream
 
     def get_format(self) -> str:
         """Returns the format associated with the selected stream"""
