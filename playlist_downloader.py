@@ -44,6 +44,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--path')
     parser.add_argument('-a', '--artist')
     parser.add_argument('-e', '--extension')
+    parser.add_argument('--append', type=str, nargs="+")
 
     parsed_args = parser.parse_args(sys.argv[1:])
 
