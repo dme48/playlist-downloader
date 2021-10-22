@@ -8,6 +8,7 @@ from scrap import Scrapper
 from search import YTVideo
 from downloads import DownloadManager, Downloader
 
+
 class TestScrapper(unittest.TestCase):
     """
     Scrapper class tests.
@@ -53,7 +54,8 @@ class TestScrapper(unittest.TestCase):
 
     def test_searchstring(self) -> None:
         """Checks the titles from the playlist are as expected."""
-        searchstring = ["{}, {}".format(s, a) for s, a in zip(self.TITLES, self.ARTISTS)]
+        searchstring = ["{}, {}".format(s, a)
+                        for s, a in zip(self.TITLES, self.ARTISTS)]
         fetched_searchstring = Scrapper(self.URL, None).get_searchstring()
         self.assertEqual(searchstring, fetched_searchstring)
 
@@ -75,6 +77,7 @@ class TestScrapper(unittest.TestCase):
         with self.assertRaises(ValueError):
             Scrapper(self.URL, non_present_artist)
 
+
 class TestYTVideo(unittest.TestCase):
     """YTVideo class tests"""
 
@@ -84,12 +87,13 @@ class TestYTVideo(unittest.TestCase):
         with self.assertRaises(ValueError):
             YTVideo(unusual_searchstring)
 
+
 class TestDownloader(unittest.TestCase):
     """Downloader class tests"""
 
     TITLE = "Hey Jude"
     PATH = "Testing"
-    CALLBACK = lambda self, x, y, z: None
+    def CALLBACK(self, x, y, z): return None
 
     def test_multiple_calls_to_donwload(self) -> None:
         """Should raise an error when star_all is called multiple times"""
@@ -114,6 +118,7 @@ class TestDownloader(unittest.TestCase):
             Downloader("Hey Jude", self.PATH, self.class_bad_callback)
             Downloader("Hey Jude", self.PATH, self.static_bad_callback)
 
+
 class TestDownloadManager(unittest.TestCase):
     """DownloadManager class tests"""
     PATH = "Testing"
@@ -130,6 +135,17 @@ class TestDownloadManager(unittest.TestCase):
         bad_songlist[0] = 1.3
         with self.assertRaises(TypeError):
             DownloadManager(bad_songlist, self.PATH)
+
+
+class TestConverter(unittest.TestCase):
+    """Tests Converter from conversion module"""
+    TEST_SONG_PATH = "Testing/The Beatles - Hey Jude.mp4"
+
+    def test_nonexistent_file(self):
+        """Tries to create an instance with a path not containing a file."""
+        nonexistent_file = "Testing/The Rolling Stones - Hey Jude.mp4"
+        with self.assertRaises(TypeError):
+            Converter(nonexistent_file)
 
 
 if __name__ == "__main__":
