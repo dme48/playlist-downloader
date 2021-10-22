@@ -10,6 +10,7 @@ If no options are provided, the program creates a `Songs` folder and downloads a
 
 ## Options
 
+    -h                                   Show help on how to execute the program.
     -p PATH                              Path of the destination folder for the downloaded
                                          songs. Will be created if not present. Defaults
                                          to "Songs/".
@@ -17,6 +18,11 @@ If no options are provided, the program creates a `Songs` folder and downloads a
                                          downloading only those whose author matches
                                          <author> (case insensitive).
     -e EXTENSION                         Desired format for the downloaded files.
+
+    --append [SONG_SEQUENCE]             Appends the songs in SONG_SEQUENCE to the songs
+                                         extracted from the playlist. Including the artist
+                                         in the searchstring (e.g. "Hey Jude, Beatles") is
+                                         allowed and recommended.
 
 ## About
 Playlist Downloader's core structure is quite simple, connecting two main elements:
