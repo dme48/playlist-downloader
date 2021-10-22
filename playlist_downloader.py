@@ -46,6 +46,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('url',
                         type=str,
+                        nargs="?",
                         help="Spotify's playlist")
     parser.add_argument('-p', '--path', metavar="DESTINATION_PATH",
                         help="Path of the directory songs are downloaded into.")
