@@ -3,9 +3,12 @@ Suite of tests for the Playlist Downloader program. Roughly, each class in the p
 one representing class here (f.x. Scrapper has TestScrapper) and each function a function
 (Scrapper.get_titles has test_titles).
 """
+import os
+import shutil
 import unittest
 from scrap import Scrapper
 from search import YTVideo
+from conversion import Converter
 from downloads import DownloadManager, Downloader
 
 
@@ -140,12 +143,39 @@ class TestDownloadManager(unittest.TestCase):
 class TestConverter(unittest.TestCase):
     """Tests Converter from conversion module"""
     TEST_SONG_PATH = "Testing/The Beatles - Hey Jude.mp4"
+    copy_count = 0
 
-    def test_nonexistent_file(self):
+    def copy_testing_song(self) -> str:
+        """
+        Copies TEST_SONG_PATH so tests can use the second without interfering.
+        Returns the path of the copy.
+        """
+        copy_path = f"Testing/testing_copy_{self.copy_count}.mp3"
+        self.copy_count += 1
+        shutil.copy(self.TEST_SONG_PATH, copy_path)
+        return copy_path
+
+    def test_nonexistent_file(self) -> None:
         """Tries to create an instance with a path not containing a file."""
         nonexistent_file = "Testing/The Rolling Stones - Hey Jude.mp4"
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             Converter(nonexistent_file)
+
+    def test_delete_original(self) -> None:
+        """Tests that original file is deleted by delete_original"""
+        copy_path = self.copy_testing_song()
+        self.assertTrue(os.path.exists(copy_path))
+        conv = Converter(copy_path)
+        conv.delete_original()
+        self.assertFalse(os.path.exists(copy_path))
+
+    def test_double_delete(self) -> None:
+        """Tries to delete original files twice"""
+        copy_path = self.copy_testing_song()
+        converter = Converter(copy_path)
+        converter.delete_original()
+        with self.assertRaises(ValueError):
+            converter.delete_original()
 
 
 if __name__ == "__main__":

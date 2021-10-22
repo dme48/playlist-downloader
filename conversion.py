@@ -40,6 +40,8 @@ class Converter:
 
     def delete_original(self) -> None:
         """Deletes the original file"""
+        # We check in case path has been already deleted
+        check_path(self.original_path)
         os.remove(self.original_path)
 
 
