@@ -1,6 +1,5 @@
 #!/usr/bin/python
 """Searches and downloads a playlist"""
-import sys
 import argparse
 from scrap import Scrapper
 from downloads import DownloadManager
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--extension')
     parser.add_argument()
 
-    parsed_args = parser.parse_args(sys.argv[1:])
+    parsed_args = parser.parse_args()
 
     main(parsed_args.url,
          parsed_args.artist,
