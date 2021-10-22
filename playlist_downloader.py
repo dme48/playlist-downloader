@@ -52,6 +52,9 @@ if __name__ == "__main__":
 
     parsed_args = parser.parse_args(sys.argv[1:])
 
+    if not parsed_args.url and not parsed_args.appended_songs:
+        parser.error("Either a url or a list of appended songs (--append) must be provided.")
+
     main(parsed_args.url,
          parsed_args.artist,
          parsed_args.path,
