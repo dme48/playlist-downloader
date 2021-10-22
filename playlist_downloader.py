@@ -23,11 +23,10 @@ def main(url: str,
         extension (str): Desired format of the output audios (mp3, f.x.).
         appended_songs (list[str]): list with searchings to be appended to the playlist songs.
     """
-    if not url:
-        raise TypeError("A valid url must be provided.")
     path = path if path else "Songs/"
-
-    playlist_titles = Scrapper(url, artist).get_searchstring()
+    playlist_titles = []
+    if url:
+        playlist_titles += Scrapper(url, artist).get_searchstring()
     if appended_songs:
         playlist_titles += appended_songs
 
