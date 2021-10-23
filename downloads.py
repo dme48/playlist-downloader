@@ -90,13 +90,13 @@ class Downloader:
 
     def stream(self) -> Stream:
         """
-        Returns the stream associated to the video. The stream is saved at video's cache, so after
+        Returns the stream associated to the video. The stream is saved at YTVideo's cache, so after
         the first call, get_stream is unexpensive to call.
         """
         return self.video.get_stream()
 
     def download(self) -> None:
-        """Thread wrapper around stream_download_call"""
+        """Thread wrapper around _stream_download_call"""
         if self.job:
             raise ValueError(f"Download already at progress\nVid:{self.get_filename}")
         self.job = threading.Thread(target=self._stream_download_call)
