@@ -9,7 +9,8 @@ from conversion import ConversionManager
 def main(url: str,
          artist: str,
          path: str,
-         extension: str) -> None:
+         extension: str,
+         appended_songs: list[str]) -> None:
     """
     Downloads the songs inside a playlist.
     Parameters:
@@ -19,12 +20,14 @@ def main(url: str,
             selected_artist will be downloaded (case insensitive)
         path (str): Folder to download the songs into. If it doesn't exist it will be created.
         extension (str): Desired format of the output audios (mp3, f.x.).
+        appended_songs (list[str]): list with searchings to be appended to the playlist songs.
     """
-    if not url:
-        raise TypeError("A valid url must be provided.")
     path = path if path else "Songs/"
-
-    playlist_titles = Scrapper(url, artist).get_searchstring()
+    playlist_titles = []
+    if url:
+        playlist_titles += Scrapper(url, artist).get_searchstring()
+    if appended_songs:
+        playlist_titles += appended_songs
 
     down_manager = DownloadManager(playlist_titles, path)
     down_manager.start_all()
@@ -39,15 +42,33 @@ def main(url: str,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('url')
-    parser.add_argument('-p', '--path')
-    parser.add_argument('-a', '--artist')
-    parser.add_argument('-e', '--extension')
-    parser.add_argument()
+    parser.add_argument('url',
+                        type=str,
+                        nargs="?",
+                        help="Spotify's playlist")
+    parser.add_argument('-p', '--path', metavar="DESTINATION_PATH",
+                        help="Path of the directory songs are downloaded into.")
+    parser.add_argument('-a', '--artist',
+                        type=str,
+                        help="Artist to be filter songs by; if indicated only songs by ARTIST \
+                              are downloaded")
+    parser.add_argument('-e', '--extension',
+                        type=str,
+                        help="Desired audio extension for the downloaded files. By default, the \
+                              original format of the youtube's video audio; typically mp4.")
+    parser.add_argument('--append', 
+                        type=str,
+                        nargs="+",
+                        dest="appended_songs",
+                        help="List of songs to append to include in the download.")
 
     parsed_args = parser.parse_args()
+
+    if not parsed_args.url and not parsed_args.appended_songs:
+        parser.error("Either a url or a list of appended songs (--append) must be provided.")
 
     main(parsed_args.url,
          parsed_args.artist,
          parsed_args.path,
-         parsed_args.extension)
+         parsed_args.extension,
+         parsed_args.appended_songs)
