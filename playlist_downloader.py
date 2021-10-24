@@ -7,10 +7,11 @@ from conversion import ConversionManager
 
 
 def main(url: str,
-         artist: str,
-         path: str,
-         extension: str,
-         appended_songs: list[str]) -> None:
+         artist: str = None,
+         path: str = None,
+         extension: str = None,
+         keep_originals: bool = False,
+         appended_songs: list[str] = None) -> None:
     """
     Downloads the songs inside a playlist.
     Parameters:
@@ -37,7 +38,23 @@ def main(url: str,
     if extension:
         conv_manager = ConversionManager(audio_paths)
         conv_manager.convert_all("mp3")
-        conv_manager.delete_originals()
+        if not keep_originals:
+            conv_manager.delete_originals()
+
+
+def check_arguments_are_valid(args: argparse.Namespace, parser: argparse.ArgumentParser):
+    """
+    Checks that the arguments in args are valid, otherwise sends an error through parser.
+    Checks for:
+        - Either url or appended_songs being present
+        - keep_originals can only be present if another extension has been provided
+    """
+    if not args.url and not args.appended_songs:
+        parser.error(
+            "Either a url or a list of appended songs (--append) must be provided.")
+    if not args.extension and args.keep_originals:
+        parser.error(
+            "Flag --keep-originals may only be passed if a change of extension (--extension) is provided.")
 
 
 if __name__ == "__main__":
@@ -56,19 +73,23 @@ if __name__ == "__main__":
                         type=str,
                         help="Desired audio extension for the downloaded files. By default, the \
                               original format of the youtube's video audio; typically mp4.")
-    parser.add_argument('--append', 
+    parser.add_argument('--keep-originals',
+                        action="store_true",
+                        help="Keep original files. Only valid if --extension argument is provided.")
+
+    parser.add_argument('--append',
                         type=str,
                         nargs="+",
                         dest="appended_songs",
                         help="List of songs to append to include in the download.")
 
     parsed_args = parser.parse_args()
-
-    if not parsed_args.url and not parsed_args.appended_songs:
-        parser.error("Either a url or a list of appended songs (--append) must be provided.")
+    check_arguments_are_valid(parsed_args, parser)
 
     main(parsed_args.url,
-         parsed_args.artist,
-         parsed_args.path,
-         parsed_args.extension,
-         parsed_args.appended_songs)
+         artist=parsed_args.artist,
+         path=parsed_args.path,
+         extension=parsed_args.extension,
+         keep_originals=parsed_args.keep_originals,
+         appended_songs=parsed_args.appended_songs
+         )
