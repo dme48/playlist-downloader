@@ -1,6 +1,7 @@
 #!/usr/bin/python
 """Searches and downloads a playlist"""
 import argparse
+from pathlib import Path
 from scrap import Scrapper
 from downloads import DownloadManager
 from conversion import ConversionManager
@@ -19,11 +20,11 @@ def main(url: str,
             app by right-clicking --> Share --> Copy Spotify URL.
         artist (str): if different than None, only the songs with an artist containing
             selected_artist will be downloaded (case insensitive)
-        path (str): Folder to download the songs into. If it doesn't exist it will be created.
+        path (Path): Folder to download the songs into. If it doesn't exist it will be created.
         extension (str): Desired format of the output audios (mp3, f.x.).
         appended_songs (list[str]): list with searchings to be appended to the playlist songs.
     """
-    path = path if path else "Songs/"
+    path = path if path else Path("Songs/")
     playlist_titles = []
     if url:
         playlist_titles += Scrapper(url, artist).get_searchstring()
@@ -64,6 +65,7 @@ if __name__ == "__main__":
                         nargs="?",
                         help="Spotify's playlist")
     parser.add_argument('-p', '--path', metavar="DESTINATION_PATH",
+                        type=Path,
                         help="Path of the directory songs are downloaded into.")
     parser.add_argument('-a', '--artist',
                         type=str,

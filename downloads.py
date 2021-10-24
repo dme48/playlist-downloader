@@ -2,6 +2,7 @@
 import os
 import threading
 from typing import Callable
+from pathlib import Path
 from pytube import Stream
 from search import YTVideo
 from progressbar import DownloadProgressBar, QueryProgressBar
@@ -11,7 +12,7 @@ Callback = Callable[[Stream, bytes, int], None]
 class DownloadManager:
     """Class that handles all the downloads through Downloader instances"""
 
-    def __init__(self, song_list: list[str], path: str) -> None:
+    def __init__(self, song_list: list[str], path: Path) -> None:
         """
         Creates a Downloader instance for each song in song_list.
         Initializes the has_started list, which keeps track of which downloads have been
@@ -24,17 +25,15 @@ class DownloadManager:
         """
         check_songlist(song_list)
         self.song_list = song_list
-        self.path = path if path.endswith("/") else path + "/"
         self.has_started = False
-
+        if not path.exists():
+            path.mkdir()
+        self.path = path
         self.query_bar = QueryProgressBar(len(song_list))
         self.downloads = [Downloader(song, self.path, self.callback) for song in song_list]
 
         stream_list = [d.stream() for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
-
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
 
     def start_all(self) -> None:
         """Starts all downloads that haven't started already."""
@@ -49,9 +48,9 @@ class DownloadManager:
                 raise ValueError(f"Download at {downloader} hasn't been called yet")
             downloader.job.join()
 
-    def get_file_paths(self) -> None:
+    def get_file_paths(self) -> list[Path]:
         """Returns the audio file paths; can only be called after downloads are finished"""
-        return [d.get_absolute_filename() for d in self.downloads]
+        return [d.get_absolute_path() for d in self.downloads]
 
     def is_download_complete(self) -> None:
         """Checks every Downloader has finished downloading its song"""
@@ -75,7 +74,7 @@ class Downloader:
     """
     Class that handles the download of a single video.
     """
-    def __init__(self, title: str, path:str, callback: Callback) -> None:
+    def __init__(self, title: str, path:Path, callback: Callback) -> None:
         """
         Querys and selects a video; sets the download as a thread.
             Parameters:
@@ -113,9 +112,9 @@ class Downloader:
         ext = self.video.get_format()
         return f"{filename}.{ext}"
 
-    def get_absolute_filename(self) -> str:
+    def get_absolute_path(self) -> Path:
         """Returns the absolute path of the downloaded song."""
-        return self.path + self.get_filename()
+        return Path(self.path, self.get_filename())
 
 
 def check_songlist(song_list: list[str]) -> None:
