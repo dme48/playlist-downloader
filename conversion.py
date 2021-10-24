@@ -33,7 +33,9 @@ class Converter:
 
     def convert_to(self, new_extension: str) -> None:
         """Converts the original file to the new_extension format"""
-        new_file = f"{self.filename}.{new_extension}"
+        new_file = Path(f"{self.filename}.{new_extension}")
+        if new_file.exists():
+            print("Warning: The file with the new extension already exists.")
         original_audio = AudioSegment.from_file(
             self.original_path, format=self.original_extension)
         original_audio.export(new_file, format=new_extension)
