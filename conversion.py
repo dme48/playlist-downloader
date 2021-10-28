@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 from pydub import AudioSegment
+from pydub.exceptions import CouldntEncodeError
 
 
 class ConversionManager:
@@ -35,12 +36,13 @@ class Converter:
     def convert_to(self, new_extension: str) -> None:
         """Converts the original file to the new_extension format"""
         new_file = Path(f"{self.filename}.{new_extension}")
-        if new_file.exists():
-            print("Warning: The file with the new extension already exists.")
         original_audio = AudioSegment.from_file(
             self.original_path,
             format=self.original_extension)
-        original_audio.export(new_file, format=new_extension)
+        try:
+            original_audio.export(new_file, format=new_extension)
+        except CouldntEncodeError:
+            raise ValueError(f"Conversion to format '{new_extension}' is not supported.")
 
     def delete_original(self) -> None:
         """Deletes the original file"""

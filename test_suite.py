@@ -176,6 +176,12 @@ class TestConverter(unittest.TestCase):
         with self.assertRaises(ValueError):
             converter.delete_original()
 
+    def test_invalid_format(self) -> None:
+        """Tries to convert to an invalid format"""
+        converter = Converter(self.TEST_SONG_PATH)
+        with self.assertRaises(ValueError):
+            converter.convert_to("exe")
+
 
 if __name__ == "__main__":
     unittest.main()
