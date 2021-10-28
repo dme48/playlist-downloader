@@ -8,7 +8,7 @@ import pathlib
 import unittest
 from scrap import Scrapper
 from search import YTVideo
-from conversion import Converter
+from conversion import ConversionManager, Converter
 from downloads import DownloadManager, Downloader
 
 
@@ -139,6 +139,17 @@ class TestDownloadManager(unittest.TestCase):
             DownloadManager(bad_songlist, self.PATH)
 
 
+class TestConversionManager(unittest.TestCase):
+    """Tests ConversionManager from conversion module"""
+    def test_invalid_filelists(self) -> None:
+        """Tries to create a ConversionManager with an empty list"""
+        with self.assertRaises(ValueError):
+            ConversionManager([])
+        with self.assertRaises(TypeError):
+            ConversionManager(None)
+        with self.assertRaises(TypeError):
+            ConversionManager(["path1", "path2"])
+
 class TestConverter(unittest.TestCase):
     """Tests Converter from conversion module"""
     TEST_SONG_PATH = pathlib.Path("Testing/The Beatles - Hey Jude.mp4")
@@ -156,7 +167,8 @@ class TestConverter(unittest.TestCase):
 
     def test_nonexistent_file(self) -> None:
         """Tries to create an instance with a path not containing a file."""
-        nonexistent_file = pathlib.Path("Testing/The Rolling Stones - Hey Jude.mp4")
+        nonexistent_file = pathlib.Path(
+            "Testing/The Rolling Stones - Hey Jude.mp4")
         with self.assertRaises(ValueError):
             Converter(nonexistent_file)
 

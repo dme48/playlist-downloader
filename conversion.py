@@ -10,6 +10,7 @@ class ConversionManager:
 
     def __init__(self, audio_paths: list[Path]) -> None:
         """Creates the converters"""
+        check_paths_are_valid(audio_paths)
         self.converters = [Converter(path) for path in audio_paths]
 
     def convert_all(self, new_extension) -> None:
@@ -28,7 +29,7 @@ class Converter:
 
     def __init__(self, path: Path) -> None:
         """Parses the original name and extension"""
-        check_path(path)
+        check_file_exists(path)
         self.original_path = path
         self.filename, extension = os.path.splitext(path)
         self.original_extension = extension.split(".")[1]
@@ -47,11 +48,20 @@ class Converter:
     def delete_original(self) -> None:
         """Deletes the original file"""
         # We check in case path has been already deleted
-        check_path(self.original_path)
+        check_file_exists(self.original_path)
         self.original_path.unlink()
 
+def check_paths_are_valid(paths: list[Path]) -> None:
+    """Checks that the list of paths is not empty or None and that they're instances of Path"""
+    if paths == None:
+        raise TypeError("Variable 'audio_paths' can't be None")
+    if not paths:
+        raise ValueError("The list of audio files to be converted was empty")
+    for path in paths:
+        if not isinstance(path, Path):
+            raise TypeError("Provided paths must be of type pathlib.Path")
 
-def check_path(path: Path) -> None:
+def check_file_exists(path: Path) -> None:
     """Checks a file exists at path."""
     if not path.exists():
         raise ValueError(f"File is not found at {path}.")
