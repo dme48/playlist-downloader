@@ -1,7 +1,7 @@
 """Module for converting playlist_downloader's audio files into different formats."""
 import os
-from pydub import AudioSegment
 from pathlib import Path
+from pydub import AudioSegment
 
 
 class ConversionManager:

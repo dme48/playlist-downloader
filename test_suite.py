@@ -3,7 +3,6 @@ Suite of tests for the Playlist Downloader program. Roughly, each class in the p
 one representing class here (f.x. Scrapper has TestScrapper) and each function a function
 (Scrapper.get_titles has test_titles).
 """
-import os
 import shutil
 import pathlib
 import unittest

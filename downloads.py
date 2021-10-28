@@ -1,5 +1,4 @@
 """Container for the Downloader class"""
-import os
 import threading
 from typing import Callable
 from pathlib import Path
