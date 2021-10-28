@@ -5,6 +5,7 @@ one representing class here (f.x. Scrapper has TestScrapper) and each function a
 """
 import os
 import shutil
+import pathlib
 import unittest
 from scrap import Scrapper
 from search import YTVideo
@@ -96,11 +97,10 @@ class TestDownloader(unittest.TestCase):
 
     TITLE = "Hey Jude"
     PATH = "Testing"
-    def CALLBACK(self, x, y, z): return None
 
     def test_multiple_calls_to_donwload(self) -> None:
         """Should raise an error when star_all is called multiple times"""
-        downloader = Downloader(self.TITLE, self.PATH, self.CALLBACK)
+        downloader = Downloader(self.TITLE, self.PATH, lambda x, y, z: None)
         with self.assertRaises(ValueError):
             downloader.download()
             downloader.download()
@@ -142,32 +142,32 @@ class TestDownloadManager(unittest.TestCase):
 
 class TestConverter(unittest.TestCase):
     """Tests Converter from conversion module"""
-    TEST_SONG_PATH = "Testing/The Beatles - Hey Jude.mp4"
+    TEST_SONG_PATH = pathlib.Path("Testing/The Beatles - Hey Jude.mp4")
     copy_count = 0
 
-    def copy_testing_song(self) -> str:
+    def copy_testing_song(self) -> pathlib.Path:
         """
         Copies TEST_SONG_PATH so tests can use the second without interfering.
         Returns the path of the copy.
         """
-        copy_path = f"Testing/testing_copy_{self.copy_count}.mp3"
+        copy_path = pathlib.Path(f"Testing/testing_copy_{self.copy_count}.mp3")
         self.copy_count += 1
         shutil.copy(self.TEST_SONG_PATH, copy_path)
         return copy_path
 
     def test_nonexistent_file(self) -> None:
         """Tries to create an instance with a path not containing a file."""
-        nonexistent_file = "Testing/The Rolling Stones - Hey Jude.mp4"
+        nonexistent_file = pathlib.Path("Testing/The Rolling Stones - Hey Jude.mp4")
         with self.assertRaises(ValueError):
             Converter(nonexistent_file)
 
     def test_delete_original(self) -> None:
         """Tests that original file is deleted by delete_original"""
         copy_path = self.copy_testing_song()
-        self.assertTrue(os.path.exists(copy_path))
+        self.assertTrue(copy_path.exists())
         conv = Converter(copy_path)
         conv.delete_original()
-        self.assertFalse(os.path.exists(copy_path))
+        self.assertFalse(copy_path.exists())
 
     def test_double_delete(self) -> None:
         """Tries to delete original files twice"""
