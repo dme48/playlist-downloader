@@ -29,7 +29,7 @@ class DownloadManager:
             path.mkdir()
         self.path = path
         self.query_bar = QueryProgressBar(len(song_list))
-        self.downloads = [Downloader(song, self.path, self.callback) for song in song_list]
+        self.downloads = [Downloader(song, self) for song in song_list]
 
         stream_list = [d.stream() for d in self.downloads]
         self.download_bar = DownloadProgressBar(stream_list)
@@ -58,7 +58,11 @@ class DownloadManager:
                 return False
             return True
 
-    def callback(self, stream: Stream, chunk: bytes, remaining_bytes: int):
+    def query_callback(self) -> None:
+        """Updates the query progressbar. Should be called when Downloader finishes a query"""
+        self.query_bar.callback()
+
+    def download_callback(self, stream: Stream, chunk: bytes, remaining_bytes: int):
         """
         Connector between the callbacks in Downloader instances and the bar.
         See DownloadProgressBar.callback for more info about the callback.
@@ -73,17 +77,17 @@ class Downloader:
     """
     Class that handles the download of a single video.
     """
-    def __init__(self, title: str, path:Path, callback: Callback) -> None:
+    def __init__(self, title: str, parent: DownloadManager) -> None:
         """
         Querys and selects a video; sets the download as a thread.
             Parameters:
                 title (str): title of the song
-                path (str): path of the directory where the song is to be saved
-                callback (function): callback for pytube. See DownloadProgressBar.callback
+                parent (DownloadManager): Manager of the Downloader instance
         """
         self.title = title
-        self.path = path
-        self.video = YTVideo(title, callback)
+        self.path = parent.path
+        self.video = YTVideo(title, parent.download_callback)
+        parent.query_callback()
         self.job = None
 
     def stream(self) -> Stream:
