@@ -95,30 +95,15 @@ class TestDownloader(unittest.TestCase):
     """Downloader class tests"""
 
     TITLE = "Hey Jude"
-    PATH = "Testing"
+    PATH = pathlib.Path("Testing")
+    PARENT = DownloadManager([TITLE], PATH)
 
     def test_multiple_calls_to_donwload(self) -> None:
         """Should raise an error when star_all is called multiple times"""
-        downloader = Downloader(self.TITLE, self.PATH, lambda x, y, z: None)
+        downloader = Downloader(self.TITLE, self.PARENT)
         with self.assertRaises(ValueError):
             downloader.download()
             downloader.download()
-
-    def class_bad_callback(self, only_one_argument):
-        """Callback as a method with the wrong amount of arguments. Does nothing."""
-        if not self:
-            del only_one_argument
-
-    @staticmethod
-    def static_bad_callback(only_one_argument) -> None:
-        """Callback as a function with the wrong amount of arguments. Does nothing."""
-        del only_one_argument
-
-    def test_bad_callbacks(self) -> None:
-        """Tries to create a YTVideo with inappropiate callback functions"""
-        with self.assertRaises(ValueError):
-            Downloader("Hey Jude", self.PATH, self.class_bad_callback)
-            Downloader("Hey Jude", self.PATH, self.static_bad_callback)
 
 
 class TestDownloadManager(unittest.TestCase):
