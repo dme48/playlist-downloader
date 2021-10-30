@@ -27,6 +27,8 @@ class ConversionManager:
 class Converter:
     """Interface to convert the format of an audio file"""
 
+    VALID_FORMATS = ["mp3, mp4, ogg"]
+
     def __init__(self, path: Path) -> None:
         """Parses the original name and extension"""
         check_file_exists(path)
@@ -36,14 +38,13 @@ class Converter:
 
     def convert_to(self, new_extension: str) -> None:
         """Converts the original file to the new_extension format"""
+        if new_extension not in Converter.VALID_FORMATS:
+            raise ValueError(f"Conversion to format '{new_extension}' is not supported.")
         new_file = Path(f"{self.filename}.{new_extension}")
         original_audio = AudioSegment.from_file(
             self.original_path,
             format=self.original_extension)
-        try:
-            original_audio.export(new_file, format=new_extension)
-        except CouldntEncodeError:
-            raise ValueError(f"Conversion to format '{new_extension}' is not supported.")
+        original_audio.export(new_file, format=new_extension)
 
     def delete_original(self) -> None:
         """Deletes the original file"""
