@@ -3,10 +3,13 @@ Playlist Downloader is a tool to download songs from a Spotify's playlist. The s
 
 
 ## Usage
+To use playlist_downloader reach the project's folder through a shell and write:
 ```
     python playlist_downloader.py [OPTIONS] URL
 ```
-If no options are provided, the program creates a `Songs` folder and downloads all the songs present at the url into it. These files will have the original sound extension, typically a mp4 sound file.
+With URL being a link to a Spotify's playlist. Can be obtained inside spotify's desktop app by right-clicking --> Share --> Copy Spotify URL. URL is optional if an --append option is provided, otherwise it is required (see [options](##Options)).
+
+If no options are provided, the program creates a `Songs` folder and downloads all the songs present at the url into it. These files will have the original sound extension, typically a sound file extracted from a mp4 file.
 
 ## Options
 
