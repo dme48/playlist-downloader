@@ -13,25 +13,26 @@ If no options are provided, the program creates a `Songs` folder and downloads a
 
 ## Options
 
-    -h                                   Show help on how to execute the program.
+    -h, --help                           Show help on how to execute the program.
 
-    -p PATH                              Path of the destination folder for the downloaded
+    -p PATH, --path PATH                 Path of the destination folder for the downloaded
                                          songs. Will be created if not present. Defaults
                                          to "Songs/".
 
-    -a AUTHOR                            Filters the songs at the playlist by author,
+    -a ARTIST, --artist ARTIST           Filters the songs at the playlist by artist,
                                          downloading only those whose author matches
                                          <author> (case insensitive).
 
-    -e EXTENSION                         Desired format for the downloaded files.
+    -e EXTENSION, --extension EXTENSION  Desired format for the downloaded files.
 
     --keep-originals                     If a new extension is provided (through -e
                                          EXTENSION), keep the files with the original
                                          format. By default those files are deleted.
 
     --append [SONG_SEQUENCE]             Appends the songs in SONG_SEQUENCE to the songs
-                                         extracted from the playlist. Including the artist
-                                         in the searchstring (e.g. "Hey Jude, Beatles") is
+                                         extracted from the playlist. Make sure to quote each
+                                         song for proper parsing. Including the artist in the
+                                         searchstring (e.g. "Hey Jude, Beatles") is
                                          allowed and recommended.
 
 ## About
