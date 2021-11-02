@@ -11,7 +11,7 @@ from conversion import ConversionManager
 def main(args: argparse.Namespace) -> None:
     """
     Downloads the songs inside a playlist.
-    Possible parameters inside args:
+    Parameters inside args:
         url (str): url link to a Spotify's playlist. Can be obtained inside spotify's desktop
             app by right-clicking --> Share --> Copy Spotify URL.
         artist (str): if different than None, only the songs with an artist containing
