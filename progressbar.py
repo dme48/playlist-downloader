@@ -85,6 +85,6 @@ class StreamTracker:
 
     def update_downloaded_bytes(self, remaining_bytes: int) -> None:
         """Updates self.downloaded_bytes in StreamTracker"""
-        updated_bytes = self.filesize - remaining_bytes
-        self.last_chunk_size = updated_bytes - self.downloaded_bytes
-        self.downloaded_bytes = updated_bytes
+        old_downloaded_bytes = self.downloaded_bytes
+        self.downloaded_bytes = self.filesize - remaining_bytes
+        self.last_chunk_size = self.downloaded_bytes - old_downloaded_bytes
