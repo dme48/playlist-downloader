@@ -3,9 +3,9 @@
 import argparse
 from pathlib import Path
 from typing import Callable
-from scrap import Scrapper
-from downloads import DownloadManager
-from conversion import ConversionManager
+from src.scrap import Scrapper
+from src.downloads import DownloadManager
+from src.conversion import ConversionManager
 
 
 def main(args: argparse.Namespace) -> None:
