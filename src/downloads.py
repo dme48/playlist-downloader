@@ -3,8 +3,8 @@ import threading
 from typing import Callable
 from pathlib import Path
 from pytube import Stream
-from search import YTVideo
-from progressbar import DownloadProgressBar, QueryProgressBar
+from .search import YTVideo
+from .progressbar import DownloadProgressBar, QueryProgressBar
 
 Callback = Callable[[Stream, bytes, int], None]
 
