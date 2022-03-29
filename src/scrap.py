@@ -1,10 +1,11 @@
 """Container for the Scrapper class"""
+import re
 from urllib import request
 from bs4 import BeautifulSoup
 
+
 class Scrapper:
     """Class that extracts titles and artists from songs in a Spotify's url"""
-    ARTIST_ALBUM_DIVIDER = "     •"
     def __init__(self, url: str, artist: str) -> None:
         """
         Fetches the url's html and wraps it inside a BeautifulSoup instance.
@@ -13,57 +14,40 @@ class Scrapper:
         """
         self.artist = artist
         check_url_is_valid(url)
+        url = clean_url(url)
         html = request.urlopen(url).read().decode("utf-8")
-        self.html_soup = BeautifulSoup(html, "html.parser")
+        raw_text = BeautifulSoup(html, "html.parser").get_text()
 
-        if artist:
-            self.is_included = [is_substring_included(a, artist) for a in self.get_artists()]
-            self.check_match_is_found()
-        else:
-            self.is_included = None
+        self._song_data = process_raw_text(raw_text)
+        self._filter_by_artist(artist)
 
     def get_titles(self) -> list[str]:
-        """Parses the html to find all the song titles."""
-        raw_songs = self.html_soup.find_all("span", "track-name")
-        clean_songs = [tag.get_text() for tag in raw_songs]
-        if self.artist:
-            clean_songs = self.filter_by_artist(clean_songs)
-        return clean_songs
+        """Returns the titles from the songs"""
+        return [song["title"] for song in self._song_data]
 
-    def get_artists(self, filter_artists: bool=False):
-        """
-        Parses the html to find all the artist names. Slightly more complicated than the title
-        counterpart, since artist and albums share a string.
-        """
-        tag_artist_albums = self.html_soup.find_all("span", "artists-albums")
-        raw_artist_albums = [tag.get_text() for tag in tag_artist_albums]
-        sep = self.ARTIST_ALBUM_DIVIDER
-        clean_artists = [raw.split(sep)[0] for raw in raw_artist_albums]
-        if filter_artists:
-            clean_artists = self.filter_by_artist(clean_artists)
-        return clean_artists
+    def get_artists(self, filter_artists: bool = False):
+        """Returns the artists of the songs"""
+        return [song["artist"] for song in self._song_data]
 
     def get_searchstring(self) -> list[str]:
         """Gets the artist and title list and combines them in a single list 'title, artist'"""
-        titles = self.get_titles()
-        artists = self.get_artists()
+        return [f'{song["title"]}, {song["artist"]}' for song in self._song_data]
 
-        return ["{}, {}".format(t, a) for t, a in zip(titles, artists)]
-
-    def filter_by_artist(self, string_list: list[str]) -> list[str]:
+    def _filter_by_artist(self, artist) -> None:
         """Removes the elements in string_list with a corresponding False in self.is_included."""
-        return [item for item, included in zip(string_list, self.is_included) if included]
+        if not artist:
+            return
 
-    def check_match_is_found(self) -> None:
-        """Checks at least one artist match has been found"""
-        if self.is_included is None:
-            f_name = self.check_match_is_found.__name__
-            raise ValueError(f"{f_name} shouldn't be called if is_included hasn't been created.")
-        for included in self.is_included:
-            if included:
-                return
+        selection = []
+        for song in self._song_data:
+            if is_substring_included(song["artist"], artist):
+                selection.append(song)
 
-        raise ValueError(f'Artist {self.artist} had no matches in the playlist.')
+        if not selection:
+            raise ValueError(
+                f'Artist {self.artist} had no matches in the playlist.')
+
+        self._song_data = selection
 
 
 def check_url_is_valid(url: str) -> None:
@@ -74,14 +58,38 @@ def check_url_is_valid(url: str) -> None:
     prefixes_at_start = [url.startswith(p) for p in prefixes]
 
     if sum(prefixes_at_start) == 0:
-        raise ValueError("Url doesn't belong to a standard spotify's playlist.")
+        raise ValueError(
+            "Url doesn't belong to a standard spotify's playlist.")
+
+
+def clean_url(url: str) -> str:
+    """Deletes HTTPS request elements from the url"""
+    return url.split("\\?")[0]
 
 def is_substring_included(main: str, sub: str) -> bool:
     """Checks if substring is included in mainstring"""
     return main.lower().find(sub.lower()) >= 0
 
 
+START = "sec1"
+END = "You might also like"
+TRIMMING_REGEX = f"{START}|{END}"
+
+
+def process_raw_text(text: str) -> list[dict]:
+    """Process the raw text from a playlist webpage and returns the artist and song names"""
+    trimmed_text = re.split(TRIMMING_REGEX, text)[1]
+    raw_songs = re.split("[0-9]", trimmed_text)
+    extracted_data = []
+
+    for song in raw_songs:
+        title, artist = re.split("(?<=\S)(?=[A-Z])", song)[0:2]
+        extracted_data.append({"title": title, "artist": artist})
+
+    return extracted_data
+
+
 if __name__ == "__main__":
     SPOTIFY_URL = "https://open.spotify.com/playlist/4oJvONQDLoXaZ7TxkRUz3Q?si=d6eb4d34d95a40f6"
-    scrap = Scrapper(SPOTIFY_URL, None)
-    print(scrap.get_searchstring())
+    scrap = Scrapper(SPOTIFY_URL, "Enric")
+    print(scrap._song_data)
