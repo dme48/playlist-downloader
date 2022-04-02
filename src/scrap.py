@@ -70,16 +70,16 @@ def is_substring_included(main: str, sub: str) -> bool:
     """Checks if substring is included in mainstring"""
     return main.lower().find(sub.lower()) >= 0
 
-
-START = "sec1"
-END = "You might also like"
-TRIMMING_REGEX = f"{START}|{END}"
+"y.Spotify1 like2 hr 2 min 1C"
+START = ".*[0-9]+ min ([0-9]+ sec)?1"
+END = "You might also like.*"
+TRIMMING_REGEX = re.compile(f".*{START}|{END}.*")
 
 
 def process_raw_text(text: str) -> list[dict]:
     """Process the raw text from a playlist webpage and returns the artist and song names"""
-    trimmed_text = re.split(TRIMMING_REGEX, text)[1]
-    raw_songs = re.split("[0-9]", trimmed_text)
+    trimmed_text = re.sub(TRIMMING_REGEX, "", text)
+    raw_songs = re.split("[0-9]+", trimmed_text)
     extracted_data = []
 
     for song in raw_songs:
