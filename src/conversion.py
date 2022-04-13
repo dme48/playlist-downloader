@@ -27,7 +27,7 @@ class ConversionManager:
 class Converter:
     """Interface to convert the format of an audio file"""
 
-    VALID_FORMATS = ["mp3, mp4, ogg"]
+    VALID_FORMATS = ["mp3", "mp4", "ogg"]
 
     def __init__(self, path: Path) -> None:
         """Parses the original name and extension"""
